@@ -1,76 +1,55 @@
-import React from "react";
-import { useState } from "react";
-import axiosConfig, { API_ENDPOINTS } from "../api/axiosConfig";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import Input from "../components/Input";
+import Button from "../components/Button";
+
 
 export default function Login() {
-  const [formData, setFormData] = useState({ email: "", password: "" });
+  const { login } = useAuth();
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const res = await axiosConfig.post(API_ENDPOINTS.LOGIN, formData);
-
-      localStorage.setItem("token", res.data.token);
-
-      alert("Login Successful!");
-      navigate("/"); // redirect to homepage
-    } catch (err) {
-      alert(err.response?.data?.message || "Login failed");
-    }
+    setBusy(true);
+    const res = await login(form);
+    setBusy(false);
+    if (res.ok) navigate("/");
+    else alert(res.error?.message || "Login failed");
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-100 px-4">
-      <div className="bg-white shadow-xl w-full max-w-md p-8 rounded-2xl">
-        <h2 className="text-3xl font-bold text-center mb-6">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8">
+        <h2 className="text-2xl font-bold mb-2">Welcome back</h2>
+        <p className="text-sm text-gray-500 mb-6">Log in to continue</p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block mb-1 font-medium">Email</label>
-            <input
-              type="email"
-              name="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-          </div>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <Input
+           name="email" 
+          label="Email"
+           type="email"
+            value={form.email} 
+            onChange={onChange} />
 
-          <div>
-            <label className="block mb-1 font-medium">Password</label>
-            <input
-              type="password"
-              name="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-          </div>
+          <Input
+           name="password"
+           label="Password"
+            type="password"
+             value={form.password}
+              onChange={onChange} />
 
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700"
-          >
-            Login
-          </button>
+          <Button type="submit"
+           className="w-full bg-blue-600 text-white">{busy ? "Logging..." : "Login"}</Button>
         </form>
 
-        <p className="mt-4 text-center">
-          Don’t have an account?{" "}
-          <a href="/signup" className="text-blue-600 font-semibold">
-            Sign Up
-          </a>
-        </p>
+        <p className="mt-4 text-center text-sm text-gray-600">Don't have an account? <Link className="text-blue-600 font-semibold" to="/signup">Sign up</Link></p>
       </div>
     </div>
+
   );
 }

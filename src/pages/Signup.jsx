@@ -1,119 +1,40 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import axiosConfig, { API_ENDPOINTS } from "../api/axiosConfig";
+import { useAuth } from "../context/AuthContext";
+import { Link, useNavigate } from "react-router-dom";
 import { Mail, User, Lock } from "lucide-react";
+import Input from "../components/Input";
+import Button from "../components/Button";
 
 export default function Signup() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-
+  const { signup } = useAuth();
+  const [form, setForm] = useState({ name: "", email: "", password: "" });
+  const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  const handleSubmit = async (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      await axiosConfig.post(API_ENDPOINTS.REGISTER, formData);
-      alert("Account created successfully!");
-      navigate("/login");
-    } catch (err) {
-      alert(err.response?.data?.message || "Signup failed");
-    }
+    setBusy(true);
+    const res = await signup(form);
+    setBusy(false);
+    if (res.ok) navigate("/login");
+    else alert(res.error?.message || "Signup failed");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-5 
-    bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200 relative overflow-hidden">
-
-      {/* Blurred circles */}
-      <div className="absolute top-10 left-10 w-64 h-64 bg-white/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-10 right-10 w-72 h-72 bg-blue-900/20 rounded-full blur-3xl" />
-
-      {/* Glassmorphic Card */}
-      <div className="w-full max-w-lg bg-white/20 backdrop-blur-xl shadow-2xl 
-        border border-white/30 rounded-3xl p-10 relative z-10">
-
-        <h1 className="text-4xl font-extrabold text-white text-center mb-2 drop-shadow-lg">
-          Create an Account
-        </h1>
-
-        <p className="text-center text-white/80 mb-8">
-          Join our community and start your amazing journey.
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-
-          {/* Name */}
-          <div className="relative">
-            <User className="absolute left-4 top-3.5 text-gray-600" size={20} />
-            <input
-              type="text"
-              name="name"
-              required
-              placeholder="John Doe"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/70 backdrop-blur-md 
-              focus:ring-2 focus:ring-white focus:outline-none text-gray-900 placeholder-gray-500
-              shadow-sm"
-            />
-          </div>
-
-          {/* Email */}
-          <div className="relative">
-            <Mail className="absolute left-4 top-3.5 text-gray-600" size={20} />
-            <input
-              type="email"
-              name="email"
-              required
-              placeholder="example@gmail.com"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/70 backdrop-blur-md 
-              focus:ring-2 focus:ring-white focus:outline-none text-gray-900 placeholder-gray-500
-              shadow-sm"
-            />
-          </div>
-
-          {/* Password */}
-          <div className="relative">
-            <Lock className="absolute left-4 top-3.5 text-gray-600" size={20} />
-            <input
-              type="password"
-              name="password"
-              required
-              placeholder="••••••••"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/70 backdrop-blur-md 
-              focus:ring-2 focus:ring-white focus:outline-none text-gray-900 placeholder-gray-500
-              shadow-sm"
-            />
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full py-3 bg-white/90 text-blue-700 font-bold text-lg 
-            rounded-xl shadow-lg hover:bg-white transition-all duration-300"
-          >
-            Sign Up
-          </button>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 px-4">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+        <h2 className="text-2xl font-bold mb-2">Create an account</h2>
+        <p className="text-sm text-gray-500 mb-6">Join and start booking great stays</p>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <Input label="Full name" name="name" value={form.name} onChange={onChange} icon={User} />
+          <Input label="Email" name="email" value={form.email} onChange={onChange} icon={Mail} />
+          <Input label="Password" name="password" value={form.password} onChange={onChange} type="password" icon={Lock} />
+          <Button type="submit" className="w-full bg-red-500 text-white">{busy ? "Creating..." : "Sign up"}</Button>
         </form>
 
-        <p className="mt-6 text-center text-white">
-          Already have an account?{" "}
-          <Link to="/login" className="font-semibold underline">
-            Login
-          </Link>
-        </p>
+        <p className="mt-4 text-center text-sm text-gray-600">Already have an account? <Link className="text-red-500 font-semibold" to="/login">Login</Link></p>
       </div>
     </div>
   );

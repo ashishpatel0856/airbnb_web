@@ -1,50 +1,43 @@
 import axios from "axios";
 
-export const baseUrl = "http://localhost:8081/api/v1";
-
+export const baseUrl = "http://localhost:8080/api/v1"; // change if your backend port differs
 export const API_ENDPOINTS = {
   LOGIN: "/auth/login",
   REGISTER: "/auth/signup",
+  REFRESH: "/auth/refresh",
 };
 
-const excludeEndpoints = [API_ENDPOINTS.LOGIN, API_ENDPOINTS.REGISTER]; //  token for login/signup
+const exclude = [API_ENDPOINTS.LOGIN, API_ENDPOINTS.REGISTER];
 
-const axiosConfig = axios.create({
+const api = axios.create({
   baseURL: baseUrl,
-  headers: {
-    "Content-Type": "application/json",
-    Accept: "application/json",
-  },
+  headers: { "Content-Type": "application/json", Accept: "application/json" },
+  withCredentials: true,
 });
 
-axiosConfig.interceptors.request.use(
-  (config) => {
-    const shouldSkipToken = excludeEndpoints.some((endpoint) =>
-      config.url?.includes(endpoint)
-    );
-    if (!shouldSkipToken) {
+api.interceptors.request.use(
+  (cfg) => {
+    const skip = exclude.some((e) => cfg.url?.includes(e));
+    if (!skip) {
       const token = localStorage.getItem("token");
-      if (token) config.headers["Authorization"] = `Bearer ${token}`;
+      if (token) cfg.headers.Authorization = `Bearer ${token}`;
     }
-    return config;
+    return cfg;
   },
-  (error) => Promise.reject(error)
+  (err) => Promise.reject(err)
 );
 
-axiosConfig.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response) {
-      if (error.response.status === 401) {
-        window.location.href = "/login"; // redirect if unauthorized
-      } else if (error.response.status === 500) {
-        console.error("Server error. Please try again later.");
-      }
-    } else if (error.code === "ECONNABORTED") {
-      console.error("Request timeout. Please try again.");
+api.interceptors.response.use(
+  (res) => res,
+  (err) => {
+    // Centralized error handling (expand as needed: show toasts, auto-refresh, etc.)
+    if (err.response?.status === 401) {
+      // optional: clear and redirect
+      // localStorage.removeItem("token");
+      // window.location.href = "/login";
     }
-    return Promise.reject(error);
+    return Promise.reject(err);
   }
 );
 
-export default axiosConfig;
+export default api;
