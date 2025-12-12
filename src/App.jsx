@@ -26,7 +26,7 @@ export default function App() {
       />
 
       <Route
-        path="/dashboard"
+        path="/admin/hotels"
         element={
           <ProtectedRoute>
             <HotelDashboard />

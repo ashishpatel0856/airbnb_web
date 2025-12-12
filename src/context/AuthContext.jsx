@@ -2,55 +2,46 @@ import React, { createContext, useContext, useState } from "react";
 import api, { API_ENDPOINTS } from "../api/axiosConfig";
 
 const AuthContext = createContext();
-export const useAuth = () => useContext(AuthContext);
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(() => {
-    const token = localStorage.getItem("token");
-    const name = localStorage.getItem("username");
-    return token ? { token, name } : null;
-  });
-  const [loading, setLoading] = useState(false);
+export const AuthProvider = ({ children }) => {
+  // Get token from localStorage on initial load
+  const [token, setToken] = useState(localStorage.getItem("token") || null);
+const login = async ({ email, password }) => {
+  try {
+    const res = await api.post(API_ENDPOINTS.LOGIN, { email, password });
 
-  const login = async ({ email, password }) => {
-    setLoading(true);
-    try {
-      const res = await api.post(API_ENDPOINTS.LOGIN, { email, password });
-      const token = res.data?.token ?? res.data?.accessToken ?? "";
-      const name = res.data?.name ?? res.data?.username ?? "";
-      localStorage.setItem("token", token);
-      if (name) localStorage.setItem("username", name);
-      setUser({ token, name });
-      setLoading(false);
-      return { ok: true };
-    } catch (err) {
-      setLoading(false);
-      return { ok: false, error: err.response?.data || err.message };
+    // Backend sends: { accessToken: "..." }
+    const jwt = res.data?.accessToken; // <-- change from 'token' to 'accessToken'
+
+    if (!jwt) {
+      return { ok: false, error: { message: "Token missing from response" } };
     }
-  };
 
-  const signup = async (payload) => {
-    setLoading(true);
-    try {
-      await api.post(API_ENDPOINTS.REGISTER, payload);
-      setLoading(false);
-      return { ok: true };
-    } catch (err) {
-      setLoading(false);
-      return { ok: false, error: err.response?.data || err.message };
-    }
-  };
+    localStorage.setItem("token", jwt);
+    setToken(jwt);
 
+    return { ok: true };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err.response?.data || { message: "Login failed" },
+    };
+  }
+};
+
+
+  // LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    setUser(null);
-    window.location.href = "/login";
+    setToken(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ token, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
-}
+};
+
+// Hook to use auth context easily
+export const useAuth = () => useContext(AuthContext);

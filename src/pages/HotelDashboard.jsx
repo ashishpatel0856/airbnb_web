@@ -19,6 +19,7 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
     setLoading(true);
     try {
       const res = await axiosConfig.get("/admin/hotels");
+
       setHotels(res.data);
     } catch (err) {
       console.error(err);
