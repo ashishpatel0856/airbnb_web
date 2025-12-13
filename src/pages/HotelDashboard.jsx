@@ -20,7 +20,7 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
     try {
       const res = await axiosConfig.get("/admin/hotels");
 
-      setHotels(res.data);
+    setHotels(res.data?.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -31,6 +31,8 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
   useEffect(() => {
     fetchHotels();
   }, []);
+
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -48,6 +50,7 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
     }
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -62,7 +65,7 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
         city: "",
         contactInfo: { address: "", email: "", phoneNumber: "", location: "" },
         amenities: [],
-        photos: [""],
+        photos: [],
       });
       fetchHotels();
     } catch (err) {
@@ -194,14 +197,18 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
             >
               {/* Hotel Photos */}
               <div className="h-48 bg-gray-100 grid grid-cols-3 gap-1">
-                {hotel.photos?.slice(0, 3).map((photo, idx) => (
-                  <img
-                    key={idx}
-                    src={photo}
-                    alt={hotel.name}
-                    className="w-full h-full object-cover"
-                  />
-                ))}
+                  {hotel.photos
+                    ?.filter((p) => p && p.trim() !== "")
+                     .slice(0, 3)
+                     .map((photo, idx) => (
+                      <img
+                        key={idx}
+                        src={photo}
+                        alt={hotel.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ))}
+
               </div>
 
               {/* Hotel Info */}

@@ -3,14 +3,21 @@ import axios from "axios";
 export const baseUrl = "http://localhost:8080/api/v1";
 
 export const API_ENDPOINTS = {
+
+  // auth endpoints
   LOGIN: "/auth/login",
   REGISTER: "/auth/signup",
 
+  // hotels endpoints
   CREATE_HOTEL: "/admin/hotels/create",
   GET_ALL_HOTELS: "/admin/hotels",
   UPDATE_HOTEL: (id) => `/admin/hotels/${id}`,
   DELETE_HOTEL: (id) => `/admin/hotels/${id}`,
   ACTIVATE_HOTEL: (id) => `/admin/hotels/${id}`,
+
+
+  // rooms endpoints
+  CREATE_ROOM
 };
 const exclude = [API_ENDPOINTS.LOGIN, API_ENDPOINTS.REGISTER];
 

@@ -10,11 +10,16 @@ const login = async ({ email, password }) => {
   try {
     const res = await api.post(API_ENDPOINTS.LOGIN, { email, password });
 
-    // Backend sends: { accessToken: "..." }
-    const jwt = res.data?.accessToken; // <-- change from 'token' to 'accessToken'
+    console.log("LOGIN RESPONSE ", res.data);
+
+    const jwt =
+      res.data?.accessToken || res.data?.data?.accessToken;
 
     if (!jwt) {
-      return { ok: false, error: { message: "Token missing from response" } };
+      return {
+        ok: false,
+        error: { message: "Token missing from response" },
+      };
     }
 
     localStorage.setItem("token", jwt);
@@ -28,6 +33,7 @@ const login = async ({ email, password }) => {
     };
   }
 };
+
 
 
   // LOGOUT
