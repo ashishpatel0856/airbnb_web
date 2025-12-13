@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Rooms from "./pages/Rooms";
 export default function App() {
   return (
     <Routes>
@@ -30,6 +31,15 @@ export default function App() {
         element={
           <ProtectedRoute>
             <HotelDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+          path="/admin/hotels/:hotelId/rooms"
+        element={
+          <ProtectedRoute>
+            <Rooms />
           </ProtectedRoute>
         }
       />

@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+
+
+.input {
+  @apply border rounded-md p-3 focus:ring-2 focus:ring-red-400 outline-none;
+}
+
+.btn-primary {
+  @apply bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-md font-semibold;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 hover:bg-gray-300 px-5 py-2 rounded-md;
+}
+
+.btn-edit {
+  @apply flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600;
+}
+
+.btn-danger {
+  @apply flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600;
+}
+ 

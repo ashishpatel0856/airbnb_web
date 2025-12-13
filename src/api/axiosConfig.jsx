@@ -3,22 +3,25 @@ import axios from "axios";
 export const baseUrl = "http://localhost:8080/api/v1";
 
 export const API_ENDPOINTS = {
-
   // auth endpoints
   LOGIN: "/auth/login",
   REGISTER: "/auth/signup",
 
-  // hotels endpoints
+  // hotel endpoints
   CREATE_HOTEL: "/admin/hotels/create",
   GET_ALL_HOTELS: "/admin/hotels",
-  UPDATE_HOTEL: (id) => `/admin/hotels/${id}`,
-  DELETE_HOTEL: (id) => `/admin/hotels/${id}`,
-  ACTIVATE_HOTEL: (id) => `/admin/hotels/${id}`,
-
+  UPDATE_HOTEL: (hotelId) => `/admin/hotels/${hotelId}`,
+  DELETE_HOTEL: (hotelId) => `/admin/hotels/${hotelId}`,
+  ACTIVATE_HOTEL: (hotelId) => `/admin/hotels/${hotelId}`,
 
   // rooms endpoints
-  CREATE_ROOM
+  CREATE_ROOM: (hotelId) => `/admin/hotels/${hotelId}/rooms`,
+  GET_ALL_ROOMS: (hotelId) => `/admin/hotels/${hotelId}/rooms`,
+  GET_ROOM: (hotelId, roomId) => `/admin/hotels/${hotelId}/rooms/${roomId}`,
+  UPDATE_ROOM: (hotelId, roomId) =>  `/admin/hotels/${hotelId}/rooms/${roomId}`,
+  DELETE_ROOM: (hotelId, roomId) => `/admin/hotels/${hotelId}/rooms/${roomId}`,
 };
+
 const exclude = [API_ENDPOINTS.LOGIN, API_ENDPOINTS.REGISTER];
 
 const api = axios.create({
