@@ -27,7 +27,7 @@ import { motion } from "framer-motion";
     setLoading(true);
     try {
       const res = await api.get(`/admin/hotels/${hotelId}/rooms`);
-      setRooms(res.data || []);
+          setRooms(res.data?.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -101,7 +101,6 @@ import { motion } from "framer-motion";
     }
   };
 
-  /* ======================= UI ======================= */
   return (
     <div className="min-h-screen bg-gray-100 p-4 md:p-8">
 

@@ -3,28 +3,55 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { isValidEmail } from "../utils/validation";
 
 export default function Login() {
   const { login } = useAuth();
   const [form, setForm] = useState({ email: "", password: "" });
-  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [errors,setErrors] = useState({});
+
+
+  // validations  apply
+
+  const validate =() => {
+    const newErrors ={};
+
+    if(!form.email.trim()){
+      newErrors.email = " Email is required";
+    } else if(!isValidEmail(form.email)){
+      newErrors.email = "Invalid email address";
+    }
+    
+  if (!form.password) {
+    newErrors.password = "Password is required";
+  } else if (form.password.length < 6) {
+    newErrors.password = "Password must be at least 6 characters";
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+
+  }
+
+
+
 
   const onChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setBusy(true);
-
+    if (!validate()) return; // validations
+    setLoading(true);
     const res = await login(form);
 
-    setBusy(false);
-
+    setLoading(false);
     if (res.ok) {
       navigate("/admin/hotels"); // dashboard
     } else {
-      alert(res.error?.message || "Login failed");
+      alert(res.error?.message || "Invalid email or password");
     }
   };
 
@@ -41,6 +68,7 @@ export default function Login() {
             type="email"
             value={form.email}
             onChange={onChange}
+            error = {errors.email}
           />
           <Input
             name="password"
@@ -48,9 +76,10 @@ export default function Login() {
             type="password"
             value={form.password}
             onChange={onChange}
+            error={errors.password}
           />
           <Button type="submit" className="w-full bg-blue-600 text-white">
-            {busy ? "Logging In..." : "Login"}
+            {loading ? "Logging In..." : "Login"}
           </Button>
         </form>
 

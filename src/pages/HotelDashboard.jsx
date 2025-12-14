@@ -8,7 +8,7 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
     name: "",
     city: "",
     contactInfo: { address: "", email: "", phoneNumber: "", location: "" },
-    amenities: [],
+    amenities: [""],
     photos: [""],
   });
   const [editHotel, setEditHotel] = useState(null);

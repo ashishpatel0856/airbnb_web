@@ -4,8 +4,32 @@ import api, { API_ENDPOINTS } from "../api/axiosConfig";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  // Get token from localStorage on initial load
+  
   const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [loading,setLoading] = useState(false); // setLoading user ko repeat action se rokta h
+
+  //signup
+ const signup = async ({ name, email, password }) => {
+  setLoading(true);
+  try {
+    const res = await api.post(API_ENDPOINTS.REGISTER, {
+      name,
+      email,
+      password,
+    });
+
+    return { ok: true };
+  } catch (err) {
+    return {
+      ok: false,
+      error: err.response?.data || { message: "Signup failed" },
+    };
+  } finally {
+    setLoading(false);
+  }
+};
+
+  //login
 const login = async ({ email, password }) => {
   try {
     const res = await api.post(API_ENDPOINTS.LOGIN, { email, password });
@@ -43,7 +67,7 @@ const login = async ({ email, password }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ token, login, logout }}>
+    <AuthContext.Provider value={{ token,signup, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
