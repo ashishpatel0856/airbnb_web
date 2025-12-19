@@ -1,22 +1,37 @@
 import React from "react";
+import { IndianRupee } from "lucide-react";
 
-export default function Card({ image, title, subtitle, price }) {
+const PLACEHOLDER =
+  "https://via.placeholder.com/400x300?text=No+Image";
+
+export default function Card({ hotel }) {
+  const images = hotel.photos?.length
+    ? hotel.photos.slice(0, 3)
+    : [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER];
+
   return (
-    <div className="bg-white rounded-xl shadow hover:shadow-lg overflow-hidden transition">
-      <div className="h-44 md:h-56 bg-gray-100">
-        {image ? <img src={image} alt={title} className="w-full h-full object-cover" /> : <div className="w-full h-full flex items-center justify-center text-gray-400">No image</div>}
-      </div>
-      <div className="p-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <h4 className="font-semibold">{title}</h4>
-            <p className="text-sm text-gray-500">{subtitle}</p>
-          </div>
-          <div className="text-right">
-            <div className="font-semibold">${price}</div>
-            <div className="text-xs text-gray-500">/ night</div>
-          </div>
+    <div className="group cursor-pointer">
+      <div className="rounded-xl overflow-hidden">
+        <div className="grid grid-cols-3 gap-[2px] h-52">
+          {images.map((img, i) => (
+            <img
+              key={i}
+              src={img}
+              className="h-full w-full object-cover group-hover:scale-105 transition"
+            />
+          ))}
         </div>
+      </div>
+
+      <div className="mt-3 space-y-1">
+        <h3 className="font-semibold text-gray-900">{hotel.name}</h3>
+        <p className="text-sm text-gray-500">{hotel.city}</p>
+        <p className="text-sm">
+          <span className="font-semibold text-gray-900">
+            ₹{hotel.basePrice}
+          </span>{" "}
+          night
+        </p>
       </div>
     </div>
   );

@@ -2,26 +2,37 @@ import React, { useState } from "react";
 import bg from "../assets/logo_bg.webp";
 
 export default function Hero() {
-  const [search, setSearch] = useState({ location: "", checkIn: "", checkOut: "", guests: 1 });
-
   return (
-    <section className="relative h-[72vh] md:h-[85vh]">
-      <img src={bg} alt="bg" className="absolute inset-0 w-full h-full object-cover brightness-60" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/30" />
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-20 text-center text-white">
-        <h1 className="text-3xl md:text-5xl font-extrabold mb-3">Find your next stay</h1>
-        <p className="text-sm md:text-lg text-white/90 mb-8">Amazing homes, curated for you</p>
+    <section className="relative h-[90vh]">
+      <img
+        src={bg}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
 
-        <div className="mx-auto w-full md:w-3/4 bg-white rounded-full p-3 shadow-lg -mt-6">
-          <div className="flex flex-col md:flex-row gap-3 items-center px-3">
-            <input className="flex-1 rounded-full px-4 py-3 outline-none" placeholder="Where to?" value={search.location} onChange={(e)=>setSearch({...search, location:e.target.value})} />
-            <input type="date" className="rounded-full px-4 py-3" value={search.checkIn} onChange={(e)=>setSearch({...search, checkIn:e.target.value})} />
-            <input type="date" className="rounded-full px-4 py-3" value={search.checkOut} onChange={(e)=>setSearch({...search, checkOut:e.target.value})} />
-            <input type="number" className="w-24 rounded-full px-4 py-3" min="1" value={search.guests} onChange={(e)=>setSearch({...search, guests:e.target.value})} />
-            <button className="bg-red-500 text-white px-6 py-3 rounded-full shadow-md">Search</button>
+      <div className="absolute inset-0 bg-black/40" />
+
+      <div className="relative z-10 h-full flex flex-col items-center justify-center text-center text-white px-4">
+        <h1 className="text-4xl md:text-6xl font-extrabold">
+          Find your next stay
+        </h1>
+        <p className="mt-4 text-lg md:text-xl text-white/90">
+          Discover unique homes & experiences
+        </p>
+
+        {/* Search Card */}
+        <div className="mt-10 bg-white text-black rounded-full shadow-xl p-3 w-full max-w-4xl">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+            <input className="px-4 py-3 rounded-full border" placeholder="Where to?" />
+            <input type="date" className="px-4 py-3 rounded-full border" />
+            <input type="date" className="px-4 py-3 rounded-full border" />
+            <input type="number" className="px-4 py-3 rounded-full border" min="1" />
+            <button className="bg-[#FF385C] text-white rounded-full px-6">
+              Search
+            </button>
           </div>
         </div>
       </div>
     </section>
   );
 }
+

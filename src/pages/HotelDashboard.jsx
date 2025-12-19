@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from "react";
-import axiosConfig, { API_ENDPOINTS } from "../api/axiosConfig";
+import axiosConfig from "../api/axiosConfig";
 import { X, Edit, Trash2, CheckCircle } from "lucide-react";
 
- function HotelDashboard() {
+export default function HotelDashboard() {
   const [hotels, setHotels] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     city: "",
     contactInfo: { address: "", email: "", phoneNumber: "", location: "" },
-    amenities: [""],
-    photos: [""],
+    amenities: [],
+    photos: [],
   });
   const [editHotel, setEditHotel] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch all hotels
+  // ================= Fetch Hotels =================
   const fetchHotels = async () => {
     setLoading(true);
     try {
       const res = await axiosConfig.get("/admin/hotels");
-
-    setHotels(res.data?.data || []);
+      setHotels(res.data?.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -32,25 +31,23 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
     fetchHotels();
   }, []);
 
-
-
+  // ================= Handle Form Changes =================
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     if (["address", "email", "phoneNumber", "location"].includes(name)) {
       setFormData((prev) => ({
         ...prev,
         contactInfo: { ...prev.contactInfo, [name]: value },
       }));
-    } else if (name === "photos") {
-      setFormData((prev) => ({ ...prev, photos: value.split(",") }));
-    } else if (name === "amenities") {
-      setFormData((prev) => ({ ...prev, amenities: value.split(",") }));
+    } else if (name === "photos" || name === "amenities") {
+      setFormData((prev) => ({ ...prev, [name]: value.split(",") }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
-
+  // ================= Create / Update Hotel =================
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -99,6 +96,76 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
       console.error(err);
       alert("Activate failed!");
     }
+  };
+
+  // ================= Render Hotel Card =================
+  const renderHotelCard = (hotel) => {
+    const photos = hotel.photos?.filter((p) => p && p.trim() !== "") || [];
+    const mainImages = photos.length > 0 ? photos.slice(0, 3) : [];
+
+    return (
+      <div
+        key={hotel.id}
+        className="bg-white rounded-xl shadow hover:shadow-lg overflow-hidden transition"
+      >
+        {/* Image Grid */}
+        <div className="h-48 grid grid-cols-3 gap-1 bg-gray-100">
+          {mainImages.length > 0
+            ? mainImages.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={hotel.name}
+                  className="w-full h-full object-cover"
+                />
+              ))
+            : [0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-full h-full flex items-center justify-center text-gray-400"
+                >
+                  No image
+                </div>
+              ))}
+        </div>
+
+        {/* Hotel Info */}
+        <div className="p-4">
+          <h3 className="font-semibold text-lg">{hotel.name || "Unnamed Hotel"}</h3>
+          <p className="text-gray-500 text-sm">{hotel.city || "Unknown City"}</p>
+          {hotel.amenities?.length > 0 && (
+            <p className="text-sm text-gray-600 mt-1">{hotel.amenities.join(", ")}</p>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
+            <button
+              onClick={() => handleEdit(hotel)}
+              className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+            >
+              <Edit size={16} /> Edit
+            </button>
+            <button
+              onClick={() => handleDelete(hotel.id)}
+              className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+            >
+              <Trash2 size={16} /> Delete
+            </button>
+            <button
+              onClick={() => handleActivate(hotel.id)}
+              className={`flex items-center gap-1 px-3 py-1 rounded-md ${
+                hotel.active
+                  ? "bg-green-500 text-white hover:bg-green-600"
+                  : "bg-gray-300 text-gray-700 hover:bg-gray-400"
+              }`}
+            >
+              <CheckCircle size={16} />
+              {hotel.active ? "Active" : "Activate"}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -190,68 +257,9 @@ import { X, Edit, Trash2, CheckCircle } from "lucide-react";
         <div className="text-center text-gray-500">Loading hotels...</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {hotels.map((hotel) => (
-            <div
-              key={hotel.id}
-              className="bg-white rounded-xl shadow hover:shadow-lg overflow-hidden transition"
-            >
-              {/* Hotel Photos */}
-              <div className="h-48 bg-gray-100 grid grid-cols-3 gap-1">
-                  {hotel.photos
-                    ?.filter((p) => p && p.trim() !== "")
-                     .slice(0, 3)
-                     .map((photo, idx) => (
-                      <img
-                        key={idx}
-                        src={photo}
-                        alt={hotel.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ))}
-
-              </div>
-
-              {/* Hotel Info */}
-              <div className="p-4">
-                <h3 className="font-semibold text-lg">{hotel.name}</h3>
-                <p className="text-gray-500 text-sm">{hotel.city}</p>
-                <p className="text-gray-500 text-sm">
-                  {hotel.amenities?.join(", ")}
-                </p>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
-                  <button
-                    onClick={() => handleEdit(hotel)}
-                    className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-                  >
-                    <Edit size={16} /> Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(hotel.id)}
-                    className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
-                  >
-                    <Trash2 size={16} /> Delete
-                  </button>
-                  <button
-                    onClick={() => handleActivate(hotel.id)}
-                    className={`flex items-center gap-1 px-3 py-1 rounded-md ${
-                      hotel.active
-                        ? "bg-green-500 text-white hover:bg-green-600"
-                        : "bg-gray-300 text-gray-700 hover:bg-gray-400"
-                    }`}
-                  >
-                    <CheckCircle size={16} />
-                    {hotel.active ? "Active" : "Activate"}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+          {hotels.map((hotel) => renderHotelCard(hotel))}
         </div>
       )}
     </div>
   );
 }
-
-export default HotelDashboard

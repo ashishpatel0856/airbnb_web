@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Rooms from "./pages/Rooms";
+
 export default function App() {
   return (
     <Routes>
@@ -14,8 +15,6 @@ export default function App() {
       <Route path="/hero" element={<Hero />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-
-
       {/* Protected routes */}
       <Route 
         path="/profile" 
