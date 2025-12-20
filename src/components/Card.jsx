@@ -1,36 +1,37 @@
+import { IndianRupee, Heart, Star } from "lucide-react";
 import React from "react";
-import { IndianRupee } from "lucide-react";
-
-const PLACEHOLDER =
-  "https://via.placeholder.com/400x300?text=No+Image";
-
 export default function Card({ hotel }) {
-  const images = hotel.photos?.length
-    ? hotel.photos.slice(0, 3)
-    : [PLACEHOLDER, PLACEHOLDER, PLACEHOLDER];
-
   return (
-    <div className="group cursor-pointer">
-      <div className="rounded-xl overflow-hidden">
-        <div className="grid grid-cols-3 gap-[2px] h-52">
-          {images.map((img, i) => (
-            <img
-              key={i}
-              src={img}
-              className="h-full w-full object-cover group-hover:scale-105 transition"
-            />
-          ))}
-        </div>
+    <div className="group rounded-2xl overflow-hidden bg-white shadow hover:shadow-2xl transition-all duration-300">
+      
+      {/* Image */}
+      <div className="relative h-72 overflow-hidden">
+        <img
+          src={hotel.image}
+          className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+        />
+
+        <button className="absolute top-3 right-3 bg-white/80 p-2 rounded-full">
+          <Heart size={18} />
+        </button>
       </div>
 
-      <div className="mt-3 space-y-1">
-        <h3 className="font-semibold text-gray-900">{hotel.name}</h3>
+      {/* Info */}
+      <div className="p-4 space-y-2">
+        <div className="flex justify-between items-center">
+          <h3 className="font-semibold">{hotel.name}</h3>
+          <div className="flex items-center gap-1 text-sm">
+            <Star size={14} className="fill-black" />
+            {hotel.rating}
+          </div>
+        </div>
+
         <p className="text-sm text-gray-500">{hotel.city}</p>
-        <p className="text-sm">
-          <span className="font-semibold text-gray-900">
-            ₹{hotel.basePrice}
-          </span>{" "}
-          night
+
+        <p className="flex items-center gap-1 mt-2">
+          <IndianRupee size={14} />
+          <span className="font-semibold">{hotel.price}</span>
+          <span className="text-gray-500 text-sm">night</span>
         </p>
       </div>
     </div>
