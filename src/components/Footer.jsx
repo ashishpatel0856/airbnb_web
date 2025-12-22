@@ -41,7 +41,7 @@ export default function Footer() {
       </div>
 
       <div className="text-center text-xs text-gray-400 pb-6">
-        © 2025 Staybnb. All rights reserved.
+        © 2025 Airbnb. All rights reserved.
       </div>
     </footer>
   );
