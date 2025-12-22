@@ -49,7 +49,8 @@ export default function Login() {
 
     setLoading(false);
     if (res.ok) {
-      navigate("/admin/hotels"); // dashboard
+      // navigate("/admin/hotels"); // dashboard
+      navigate("/")
     } else {
       alert(res.error?.message || "Invalid email or password");
     }

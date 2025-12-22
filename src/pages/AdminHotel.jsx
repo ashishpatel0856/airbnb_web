@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axiosConfig from "../api/axiosConfig";
 import { X, Edit, Trash2, CheckCircle } from "lucide-react";
 
-export default function HotelDashboard() {
+export default function AdminHotel() {
   const [hotels, setHotels] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
@@ -34,7 +34,6 @@ export default function HotelDashboard() {
   // ================= Handle Form Changes =================
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     if (["address", "email", "phoneNumber", "location"].includes(name)) {
       setFormData((prev) => ({
         ...prev,
@@ -106,10 +105,10 @@ export default function HotelDashboard() {
     return (
       <div
         key={hotel.id}
-        className="bg-white rounded-xl shadow hover:shadow-lg overflow-hidden transition"
+        className="bg-white rounded-2xl shadow hover:shadow-2xl transition-all overflow-hidden flex flex-col"
       >
         {/* Image Grid */}
-        <div className="h-48 grid grid-cols-3 gap-1 bg-gray-100">
+        <div className="grid grid-cols-3 h-48 gap-1 bg-gray-100">
           {mainImages.length > 0
             ? mainImages.map((img, idx) => (
                 <img
@@ -122,40 +121,44 @@ export default function HotelDashboard() {
             : [0, 1, 2].map((i) => (
                 <div
                   key={i}
-                  className="w-full h-full flex items-center justify-center text-gray-400"
+                  className="w-full h-full flex items-center justify-center text-gray-400 text-sm"
                 >
-                  No image
+                  No Image
                 </div>
               ))}
         </div>
 
         {/* Hotel Info */}
-        <div className="p-4">
-          <h3 className="font-semibold text-lg">{hotel.name || "Unnamed Hotel"}</h3>
-          <p className="text-gray-500 text-sm">{hotel.city || "Unknown City"}</p>
-          {hotel.amenities?.length > 0 && (
-            <p className="text-sm text-gray-600 mt-1">{hotel.amenities.join(", ")}</p>
-          )}
+        <div className="p-4 flex flex-col flex-1 justify-between">
+          <div>
+            <h3 className="font-bold text-lg text-gray-800">{hotel.name}</h3>
+            <p className="text-gray-500 text-sm">{hotel.city}</p>
+            {hotel.amenities?.length > 0 && (
+              <p className="text-gray-600 text-sm mt-1 truncate">
+                {hotel.amenities.join(", ")}
+              </p>
+            )}
+          </div>
 
           {/* Action Buttons */}
-          <div className="flex items-center justify-between mt-3 gap-2 flex-wrap">
+          <div className="flex flex-wrap gap-2 mt-4">
             <button
               onClick={() => handleEdit(hotel)}
-              className="flex items-center gap-1 px-3 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              className="flex items-center gap-1 px-3 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
             >
               <Edit size={16} /> Edit
             </button>
             <button
               onClick={() => handleDelete(hotel.id)}
-              className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600"
+              className="flex items-center gap-1 px-3 py-1 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
             >
               <Trash2 size={16} /> Delete
             </button>
             <button
               onClick={() => handleActivate(hotel.id)}
-              className={`flex items-center gap-1 px-3 py-1 rounded-md ${
+              className={`flex items-center gap-1 px-3 py-1 rounded-lg transition ${
                 hotel.active
-                  ? "bg-green-500 text-white hover:bg-green-600"
+                  ? "bg-green-600 text-white hover:bg-green-700"
                   : "bg-gray-300 text-gray-700 hover:bg-gray-400"
               }`}
             >
@@ -169,13 +172,13 @@ export default function HotelDashboard() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 bg-gray-100">
-      {/* Create / Edit Form */}
-      <div className="bg-white p-6 md:p-10 rounded-2xl shadow-lg mb-8 max-w-3xl mx-auto">
-        <h2 className="text-2xl font-bold mb-4">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-10">
+      {/* Form Card */}
+      <div className="max-w-3xl mx-auto bg-white p-6 md:p-10 rounded-2xl shadow-lg mb-10">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">
           {editHotel ? "Edit Hotel" : "Create New Hotel"}
         </h2>
-        <form className="grid gap-4" onSubmit={handleSubmit}>
+        <form className="grid gap-4 md:grid-cols-2 md:gap-6" onSubmit={handleSubmit}>
           <input
             type="text"
             name="name"
@@ -183,7 +186,7 @@ export default function HotelDashboard() {
             value={formData.name}
             onChange={handleChange}
             required
-            className="border p-3 rounded-md"
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none w-full"
           />
           <input
             type="text"
@@ -192,7 +195,7 @@ export default function HotelDashboard() {
             value={formData.city}
             onChange={handleChange}
             required
-            className="border p-3 rounded-md"
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none w-full"
           />
           <input
             type="text"
@@ -200,7 +203,7 @@ export default function HotelDashboard() {
             placeholder="Address"
             value={formData.contactInfo.address}
             onChange={handleChange}
-            className="border p-3 rounded-md"
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none w-full"
           />
           <input
             type="email"
@@ -208,7 +211,7 @@ export default function HotelDashboard() {
             placeholder="Email"
             value={formData.contactInfo.email}
             onChange={handleChange}
-            className="border p-3 rounded-md"
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none w-full"
           />
           <input
             type="text"
@@ -216,7 +219,7 @@ export default function HotelDashboard() {
             placeholder="Phone Number"
             value={formData.contactInfo.phoneNumber}
             onChange={handleChange}
-            className="border p-3 rounded-md"
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none w-full"
           />
           <input
             type="text"
@@ -224,7 +227,7 @@ export default function HotelDashboard() {
             placeholder="Location Coordinates"
             value={formData.contactInfo.location}
             onChange={handleChange}
-            className="border p-3 rounded-md"
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none w-full"
           />
           <input
             type="text"
@@ -232,7 +235,7 @@ export default function HotelDashboard() {
             placeholder="Amenities (comma separated)"
             value={formData.amenities.join(",")}
             onChange={handleChange}
-            className="border p-3 rounded-md"
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none w-full md:col-span-2"
           />
           <input
             type="text"
@@ -240,12 +243,11 @@ export default function HotelDashboard() {
             placeholder="Photo URLs (comma separated)"
             value={formData.photos.join(",")}
             onChange={handleChange}
-            className="border p-3 rounded-md"
+            className="border p-3 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none w-full md:col-span-2"
           />
-
           <button
             type="submit"
-            className="bg-red-500 hover:bg-red-600 text-white font-bold p-3 rounded-md transition"
+            className="bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg md:col-span-2 transition"
           >
             {editHotel ? "Update Hotel" : "Create Hotel"}
           </button>
@@ -257,7 +259,7 @@ export default function HotelDashboard() {
         <div className="text-center text-gray-500">Loading hotels...</div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {hotels.map((hotel) => renderHotelCard(hotel))}
+          {hotels.map(renderHotelCard)}
         </div>
       )}
     </div>

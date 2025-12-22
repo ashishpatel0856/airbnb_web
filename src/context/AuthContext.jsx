@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from "react";
-import api, { API_ENDPOINTS } from "../api/axiosConfig";
+import { API_ENDPOINTS } from "../constants/apiEndpoints";
+import api from "../api/axiosConfig";
 
 const AuthContext = createContext();
 
@@ -9,13 +10,17 @@ export const AuthProvider = ({ children }) => {
   const [loading,setLoading] = useState(false); // setLoading user ko repeat action se rokta h
 
   //signup
- const signup = async ({ name, email, password }) => {
+ const signup = async ({ name, email, password,gender,dateOfBirth ,roles}) => {
   setLoading(true);
   try {
     const res = await api.post(API_ENDPOINTS.REGISTER, {
       name,
       email,
       password,
+      gender,
+      dateOfBirth,
+       roles: [], 
+      
     });
 
     return { ok: true };
@@ -60,6 +65,7 @@ const login = async ({ email, password }) => {
 
 
 
+
   // LOGOUT
   const logout = () => {
     localStorage.removeItem("token");
@@ -75,3 +81,5 @@ const login = async ({ email, password }) => {
 
 // Hook to use auth context easily
 export const useAuth = () => useContext(AuthContext);
+
+

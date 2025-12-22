@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, User, Lock } from "lucide-react";
+import { Mail, User, Lock, Gem, Calendar,Shield } from "lucide-react";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import { useAuth } from "../context/AuthContext";
@@ -8,37 +8,52 @@ import { isStrongPassword, isValidEmail } from "../utils/validation";
 
 export default function Signup() {
   const  {signup}  = useAuth();
-  const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [errors, setErrors] = useState({});
-
+  const [form, setForm] = useState({ 
+  name: "", 
+  email: "", 
+  password: "", 
+  gender: "", 
+  roles: "", 
+  dateOfBirth: "" 
+});
 
 
   //  validations
-   const validate=() => {
-    const newErrors ={};
-    if(!form.name.trim()){
-      newErrors.name = "Name is required";
-    }
+   const validate = () => {
+  const newErrors = {};
 
-    if(!form.email.trim()){
-      newErrors.email ="Email is required"
-    } else if(!isValidEmail(form.email)){
-      newErrors.email = "invalid email format";
-    }
+  if (!form.name.trim()) {
+    newErrors.name = "Name is required";
+  }
 
-    if(!form.password){
-      newErrors.password = "Password is required";
+  if (!form.email.trim()) {
+    newErrors.email = "Email is required";
+  } else if (!isValidEmail(form.email)) {
+    newErrors.email = "Invalid email format";
+  }
 
-    } else if(!isStrongPassword(form.password)){
-      newErrors.password = 'Password must be at least 8 characters';
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length ===0;
-   }
+  if (!form.password) {
+    newErrors.password = "Password is required";
+  } else if (!isStrongPassword(form.password)) {
+    newErrors.password = "Password must be at least 8 characters";
+  }
+
+  if (!form.gender.trim()) {
+    newErrors.gender = "Gender is required";
+  }
 
 
+
+  if (!form.dateOfBirth) {
+    newErrors.dob = "Date of birth is required";
+  }
+
+  setErrors(newErrors); // set errors state
+  return Object.keys(newErrors).length === 0; // return true if no errors
+};
 
 
 
@@ -72,12 +87,12 @@ export default function Signup() {
         <form onSubmit={onSubmit} className="space-y-4">
           <Input
            label="Full name"
-            name="name" 
-            value={form.name}
-             onChange={onChange} 
-             icon={User}
-             error={errors.name}
-              />
+           name="name" 
+           value={form.name}
+           onChange={onChange} 
+           icon={User}
+           error={errors.name}  
+         />
 
           <Input
            label="Email" 
@@ -99,13 +114,58 @@ export default function Signup() {
           error={errors.password}
           />
 
+
+          <Input 
+          label="Gender" 
+          name="gender" 
+          value={form.gender} 
+          onChange={onChange} 
+          type="text" 
+          icon={Gem} 
+          error={errors.gender}
+          />
+
+           {/* ROLE SELECT */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Account Type
+            </label>
+            <div className="relative">
+              <Shield className="absolute left-3 top-3 text-gray-400" size={18} />
+              <select
+                name="roles"
+                value={form.roles}
+                onChange={onChange}
+                className="w-full pl-10 pr-3 py-3 border rounded-md focus:ring-2 focus:ring-red-400 outline-none"
+              >
+                <option value="">Select role</option>
+                <option value="GUEST">Guest</option>
+                <option value="USER">USER</option>
+                <option value="HOTEL_MANAGER">Hotel Manager</option>
+              </select>
+            </div>
+            {errors.roles && (
+              <p className="text-xs text-red-500 mt-1">{errors.roles}</p>
+            )}
+          </div>
+        
+         <Input 
+          label="Date of birth" 
+          name="dateOfBirth" 
+          value={form.dateOfBirth} 
+          onChange={onChange} 
+          type="date" 
+          icon={Calendar} 
+          error={errors.dateOfBirth}
+          />
+          
           <Button 
           type="submit" 
           className="w-full bg-red-500 text-white">
             {loading ? "Creating..." : "Sign up"}
             </Button>
         </form>
-
+          
         <p className="mt-4 text-center text-sm text-gray-600">Already have an account? <Link className="text-red-500 font-semibold" to="/login">Login</Link></p>
       </div>
     </div>
