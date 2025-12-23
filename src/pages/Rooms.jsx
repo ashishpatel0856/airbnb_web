@@ -1,35 +1,43 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import api, { API_ENDPOINTS } from "../api/axiosConfig";
-import { Plus, Trash2, Edit, BedDouble, Users, IndianRupee } from "lucide-react";
-import { motion } from "framer-motion";
+import React from "react";
+import {
+  Plus,
+  Trash2,
+  Edit,
+  BedDouble,
+  Users,
+  IndianRupee,
+  X
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import api from "../api/axiosConfig";
 
-
- function Rooms() {
+export default function Rooms() {
   const { hotelId } = useParams();
 
-  /* ======================= STATE ======================= */
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [openForm, setOpenForm] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
 
-  const [formData, setFormData] = useState({
+  const [form, setForm] = useState({
     type: "",
     basePrice: "",
     capacity: "",
     totalCount: "",
-    amenities: [],
-    photos: [],
+    amenities: "",
+    photos: ""
   });
 
-  /* ======================= API ======================= */
+  /* ================= API ================= */
   const fetchRooms = async () => {
     setLoading(true);
     try {
       const res = await api.get(`/admin/hotels/${hotelId}/rooms`);
-          setRooms(res.data?.data || []);
-    } catch (err) {
-      console.error(err);
+      setRooms(res.data?.data || []);
+    } catch (e) {
+      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -39,201 +47,142 @@ import { motion } from "framer-motion";
     fetchRooms();
   }, [hotelId]);
 
-  /* ======================= FORM ======================= */
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "amenities" || name === "photos") {
-      setFormData({ ...formData, [name]: value.split(",") });
-    } else {
-      setFormData({ ...formData, [name]: value });
-    }
-  };
-
+  /* ================= FORM ================= */
   const resetForm = () => {
     setEditingRoom(null);
-    setFormData({
+    setForm({
       type: "",
       basePrice: "",
       capacity: "",
       totalCount: "",
-      amenities: [],
-      photos: [],
+      amenities: "",
+      photos: ""
     });
+    setOpenForm(false);
   };
 
-  /* ================= CREATE / UPDATE ================= */
+  const handleChange = (e) =>
+    setForm({ ...form, [e.target.name]: e.target.value });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const payload = {
+      type: form.type,
+      basePrice: Number(form.basePrice),
+      capacity: Number(form.capacity),
+      totalCount: Number(form.totalCount),
+      amenities: form.amenities.split(",").map(a => a.trim()),
+      photos: form.photos.split(",").map(p => p.trim())
+    };
+
     try {
       if (editingRoom) {
-        await api.put(`/admin/hotels/${hotelId}/rooms/${editingRoom.id}`, formData);
+        await api.put(
+          `/admin/hotels/${hotelId}/rooms/${editingRoom.id}`,
+          payload
+        );
       } else {
-        await api.post(`/admin/hotels/${hotelId}/rooms`, formData);
+        await api.post(`/admin/hotels/${hotelId}/rooms`, payload);
       }
       resetForm();
       fetchRooms();
-    } catch (err) {
-      console.error(err);
+    } catch (e) {
       alert("Operation failed");
     }
   };
 
-  /* ================= EDIT / DELETE ================= */
   const handleEdit = (room) => {
     setEditingRoom(room);
-    setFormData({
-      ...room,
-      amenities: room.amenities || [],
-      photos: room.photos || [],
+    setForm({
+      type: room.type,
+      basePrice: room.basePrice,
+      capacity: room.capacity,
+      totalCount: room.totalCount,
+      amenities: room.amenities?.join(", ") || "",
+      photos: room.photos?.join(", ") || ""
     });
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setOpenForm(true);
   };
 
-  const handleDelete = async (roomId) => {
-    if (!window.confirm("Delete this room?")) return;
-    try {
-      await api.delete(`/admin/hotels/${hotelId}/rooms/${roomId}`);
-      fetchRooms();
-    } catch (err) {
-      console.error(err);
-      alert("Delete failed");
-    }
+  const handleDelete = async (id) => {
+    if (!confirm("Delete this room?")) return;
+    await api.delete(`/admin/hotels/${hotelId}/rooms/${id}`);
+    fetchRooms();
   };
 
+  /* ================= UI ================= */
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-2xl font-bold">Rooms</h1>
+          <p className="text-gray-500 text-sm">
+            Manage rooms for this hotel
+          </p>
+        </div>
+        <button
+          onClick={() => setOpenForm(true)}
+          className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700"
+        >
+          <Plus size={18} /> Add Room
+        </button>
+      </div>
 
-      {/* ============ HEADER ============ */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
-      >
-        <h1 className="text-3xl font-bold text-gray-800">Rooms Management</h1>
-        <p className="text-gray-500">Manage rooms for this hotel</p>
-      </motion.div>
-
-      {/* ============ FORM ============ */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="bg-white rounded-2xl shadow-lg p-6 md:p-8 mb-10 max-w-4xl mx-auto"
-      >
-        <h2 className="text-xl font-semibold mb-4">
-          {editingRoom ? "Edit Room" : "Create New Room"}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            name="type"
-            placeholder="Room Type (Deluxe, Suite)"
-            value={formData.type}
-            onChange={handleChange}
-            className="input"
-            required
-          />
-
-          <input
-            name="basePrice"
-            type="number"
-            placeholder="Base Price"
-            value={formData.basePrice}
-            onChange={handleChange}
-            className="input"
-            required
-          />
-
-          <input
-            name="capacity"
-            type="number"
-            placeholder="Capacity"
-            value={formData.capacity}
-            onChange={handleChange}
-            className="input"
-          />
-
-          <input
-            name="totalCount"
-            type="number"
-            placeholder="Total Rooms"
-            value={formData.totalCount}
-            onChange={handleChange}
-            className="input"
-          />
-
-          <input
-            name="amenities"
-            placeholder="Amenities (comma separated)"
-            value={formData.amenities.join(",")}
-            onChange={handleChange}
-            className="input md:col-span-2"
-          />
-
-          <input
-            name="photos"
-            placeholder="Photo URLs (comma separated)"
-            value={formData.photos.join(",")}
-            onChange={handleChange}
-            className="input md:col-span-2"
-          />
-
-          <div className="md:col-span-2 flex gap-3 mt-4">
-            <button className="btn-primary flex items-center gap-2">
-              <Plus size={18} /> {editingRoom ? "Update Room" : "Add Room"}
-            </button>
-            {editingRoom && (
-              <button type="button" onClick={resetForm} className="btn-secondary">
-                Cancel
-              </button>
-            )}
-          </div>
-        </form>
-      </motion.div>
-
-      {/* ============ ROOMS GRID ============ */}
+      {/* ROOMS GRID */}
       {loading ? (
-        <p className="text-center text-gray-500">Loading rooms...</p>
+        <p className="text-center text-gray-500">Loading rooms…</p>
+      ) : rooms.length === 0 ? (
+        <p className="text-center text-gray-500">
+          No rooms added yet
+        </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rooms.map((room) => (
+          {rooms.map(room => (
             <motion.div
               key={room.id}
-              whileHover={{ scale: 1.03 }}
-              className="bg-white rounded-xl shadow-md overflow-hidden"
+              whileHover={{ scale: 1.02 }}
+              className="bg-white rounded-xl shadow overflow-hidden"
             >
-              {/* Images */}
               <div className="h-40 bg-gray-200 grid grid-cols-3 gap-1">
-                {room.photos?.filter(Boolean).slice(0, 3).map((img, i) => (
-                  <img key={i} src={img} alt="room" className="object-cover w-full h-full" />
+                {(room.photos || []).slice(0, 3).map((img, i) => (
+                  <img
+                    key={i}
+                    src={img}
+                    alt=""
+                    className="w-full h-full object-cover"
+                  />
                 ))}
               </div>
 
-              {/* Info */}
               <div className="p-4">
-                <h3 className="font-semibold text-lg flex items-center gap-2">
-                  <BedDouble size={18} /> {room.type}
+                <h3 className="font-semibold flex items-center gap-2">
+                  <BedDouble size={16} /> {room.type}
                 </h3>
 
                 <div className="text-sm text-gray-600 mt-2 space-y-1">
-                  <p className="flex items-center gap-1"><IndianRupee size={14}/> {room.basePrice}</p>
-                  <p className="flex items-center gap-1"><Users size={14}/> Capacity: {room.capacity}</p>
+                  <p className="flex items-center gap-1">
+                    <IndianRupee size={14} /> {room.basePrice}
+                  </p>
+                  <p className="flex items-center gap-1">
+                    <Users size={14} /> Capacity {room.capacity}
+                  </p>
                   <p>Total Rooms: {room.totalCount}</p>
                 </div>
 
-                {/* Actions */}
                 <div className="flex justify-between mt-4">
                   <button
                     onClick={() => handleEdit(room)}
-                    className="btn-edit"
+                    className="text-blue-600 flex items-center gap-1"
                   >
-                    <Edit size={16} /> Edit
+                    <Edit size={14} /> Edit
                   </button>
                   <button
                     onClick={() => handleDelete(room.id)}
-                    className="btn-danger"
+                    className="text-red-600 flex items-center gap-1"
                   >
-                    <Trash2 size={16} /> Delete
+                    <Trash2 size={14} /> Delete
                   </button>
                 </div>
               </div>
@@ -241,9 +190,59 @@ import { motion } from "framer-motion";
           ))}
         </div>
       )}
+
+      {/* FORM DRAWER */}
+      <AnimatePresence>
+        {openForm && (
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            className="fixed top-0 right-0 w-full sm:w-[420px] h-full bg-white shadow-xl p-6 z-50 overflow-y-auto"
+          >
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="font-bold text-lg">
+                {editingRoom ? "Edit Room" : "Add Room"}
+              </h2>
+              <X onClick={resetForm} className="cursor-pointer" />
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {["type", "basePrice", "capacity", "totalCount"].map(f => (
+                <input
+                  key={f}
+                  name={f}
+                  placeholder={f}
+                  value={form[f]}
+                  onChange={handleChange}
+                  className="w-full border rounded-lg p-3"
+                  required
+                />
+              ))}
+
+              <textarea
+                name="amenities"
+                placeholder="Amenities (comma separated)"
+                value={form.amenities}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-3"
+              />
+
+              <textarea
+                name="photos"
+                placeholder="Photo URLs (comma separated)"
+                value={form.photos}
+                onChange={handleChange}
+                className="w-full border rounded-lg p-3"
+              />
+
+              <button className="w-full bg-red-600 text-white py-3 rounded-lg">
+                {editingRoom ? "Update Room" : "Create Room"}
+              </button>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
-
-export default Rooms;
-

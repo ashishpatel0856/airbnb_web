@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AdminHotel from "./pages/AdminHotel";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Rooms from "./pages/Rooms";
 
 export default function App() {
   return (
@@ -22,6 +23,16 @@ export default function App() {
           </ProtectedRoute>
         }
       />
+
+            <Route
+        path="/admin/hotels/:hotelId/rooms"
+        element={
+          <ProtectedRoute allowedRoles={["HOTEL_MANAGER"]}>
+            <Rooms />
+          </ProtectedRoute>
+        }
+      />
+
     </Routes>
   );
 }
