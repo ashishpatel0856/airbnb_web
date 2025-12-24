@@ -5,30 +5,28 @@ import Card from "../components/Card";
 import Footer from "../components/Footer";
 import React, { useEffect, useState } from "react";
 import api from "../api/axiosConfig";
+import { Link } from "lucide-react";
+
 
 export default function Home() {
   const [hotels, setHotels] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+
+  // ✅ Fetch public hotels
+  const allPublicHotels = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get("/public/hotels");
+      setHotels(res.data.data); 
+    } catch (err) {
+      console.error("Error fetching hotels", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    api.post("/hotels/search", {
-      city: "Prayagraj",                 // 👈 test city
-      startDate: new Date().toISOString().slice(0, 10),
-      endDate: new Date(Date.now() + 2 * 86400000)
-        .toISOString()
-        .slice(0, 10),
-      roomsCount: 1,
-      page: 0,
-      size: 9
-    })
-      .then(res => {
-        console.log("HOTELS", res.data);
-        setHotels(res.data?.content || []);
-      })
-      .catch(err => {
-        console.error("Search error", err);
-      })
-      .finally(() => setLoading(false));
+    allPublicHotels();
   }, []);
 
   return (
@@ -38,9 +36,7 @@ export default function Home() {
       <Gallery />
 
       <section className="max-w-7xl mx-auto px-6 py-16">
-        <h2 className="text-2xl font-bold mb-8">
-          Featured stays
-        </h2>
+        <h2 className="text-2xl font-bold mb-8">Featured stays</h2>
 
         {loading ? (
           <p>Loading hotels...</p>
@@ -48,8 +44,11 @@ export default function Home() {
           <p>No hotels available</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {hotels.map(hotel => (
-              <Card key={hotel.id} hotel={hotel} />
+            {hotels.map((hotel) => (
+              <Link key={hotel.id} to={`/hotels/${hotel.id}`}>
+              <Card hotel={hotel}/>
+              </Link>
+              // <Card key={hotel.id} hotel={hotel}/>
             ))}
           </div>
         )}
