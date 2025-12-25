@@ -8,21 +8,17 @@ export default function Hero() {
   return (
     <section className="relative min-h-screen flex items-center">
       
-      {/* Background */}
-      <img
+\      <img
         src={bg}
         alt="Hero background"
         className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/60" />
 
-      {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl">
 
-          {/* Heading */}
           <motion.h1
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -34,7 +30,6 @@ export default function Hero() {
             anywhere in the world
           </motion.h1>
 
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -45,7 +40,6 @@ export default function Hero() {
             experiences tailored just for you.
           </motion.p>
 
-          {/* Search Card */}
           <motion.div
             initial={{ opacity: 0, y: 60 }}
             animate={{ opacity: 1, y: 0 }}
@@ -62,7 +56,6 @@ export default function Hero() {
           >
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
 
-              {/* Location */}
               <div className="flex flex-col">
                 <label className="text-xs font-semibold text-gray-600 mb-1">
                   Location
@@ -77,7 +70,6 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Check in */}
               <div className="flex flex-col">
                 <label className="text-xs font-semibold text-gray-600 mb-1">
                   Check in
@@ -91,7 +83,6 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Check out */}
               <div className="flex flex-col">
                 <label className="text-xs font-semibold text-gray-600 mb-1">
                   Check out
@@ -105,7 +96,6 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Guests */}
               <div className="flex flex-col">
                 <label className="text-xs font-semibold text-gray-600 mb-1">
                   Guests
@@ -121,7 +111,6 @@ export default function Hero() {
                 </div>
               </div>
 
-              {/* Search Button */}
               <div className="flex items-end">
                 <Button className="w-full bg-[#FF385C] hover:bg-[#e0314f] text-white rounded-2xl">
                   Search

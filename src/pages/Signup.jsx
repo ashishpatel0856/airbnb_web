@@ -20,7 +20,7 @@ export default function Signup() {
     dateOfBirth: "",
   });
 
-  // =================== VALIDATION ===================
+  // validations
   const validate = () => {
     const newErrors = {};
 
@@ -46,7 +46,7 @@ export default function Signup() {
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
-  // =================== SUBMIT ===================
+  
   const onSubmit = async (e) => {
   e.preventDefault();
   if (!validate()) return;

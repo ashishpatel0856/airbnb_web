@@ -35,8 +35,8 @@ export default function Home() {
       <Hero />
       <Gallery />
 
-      <section className="max-w-7xl mx-auto px-6 py-16">
-        <h2 className="text-2xl font-bold mb-8">Featured stays</h2>
+      <section className="max-w-7xl mt-0 mx-auto px-6 py-16">
+        <h2 className="text-2xl text-center  font-bold mb-8">Available All Hotels</h2>
 
         {loading ? (
           <p>Loading hotels...</p>

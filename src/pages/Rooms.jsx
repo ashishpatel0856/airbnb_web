@@ -30,7 +30,7 @@ export default function Rooms() {
     photos: ""
   });
 
-  /* ================= API ================= */
+  // room manage api
   const fetchRooms = async () => {
     setLoading(true);
     try {
@@ -47,7 +47,7 @@ export default function Rooms() {
     fetchRooms();
   }, [hotelId]);
 
-  /* ================= FORM ================= */
+  // set forms
   const resetForm = () => {
     setEditingRoom(null);
     setForm({
@@ -111,7 +111,6 @@ export default function Rooms() {
     fetchRooms();
   };
 
-  /* ================= UI ================= */
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       {/* HEADER */}

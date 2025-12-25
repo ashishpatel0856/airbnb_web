@@ -16,8 +16,8 @@ const HotelDetails = () => {
         try {
            const res = await api.get(`/public/hotels/${hotelId}`);
            console.log("Hotel details",res.data)
-           setHotel(res.data?.data.hotel); // hotel info
-           setRooms(res.data?.data?.rooms || []); // rooms details
+           setHotel(res.data?.data.hotel); 
+           setRooms(res.data?.data?.rooms || []);
            console.log("Hotel:", res.data.data.hotel);
            console.log("Rooms:", res.data.data.rooms);
 
