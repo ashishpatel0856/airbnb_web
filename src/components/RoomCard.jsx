@@ -42,7 +42,6 @@ export default function RoomCard({ room }) {
               {room.totalCount}
             </p>
           </div>
-
         </div>
 
         <div className="mt-auto">

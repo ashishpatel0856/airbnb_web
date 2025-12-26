@@ -2,6 +2,8 @@ import axios from "axios";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
 
 export const baseUrl = "http://localhost:8080/api/v1";
+// export const baseUrl = "https://airbnb-backend-872m.onrender.com/api/v1";
+
 
 const exclude = [
   API_ENDPOINTS.LOGIN,
