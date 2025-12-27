@@ -17,7 +17,7 @@ export default function Login() {
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState("");
 
-  // ===================== Validation =====================
+  //  validation
   const validate = () => {
     const newErrors = {};
 
@@ -35,14 +35,12 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ===================== Input Change =====================
   const onChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setErrors({});
     setSubmitError("");
   };
 
-  // ===================== Submit =====================
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -54,7 +52,7 @@ export default function Login() {
     }
   };
 
-  // ===================== Role Based Redirect =====================
+  // role based
 useEffect(() => {
   if (!userRole || userRole.length === 0) return;
 
@@ -66,7 +64,6 @@ useEffect(() => {
 }, [userRole, navigate]);
 
 
-  // ===================== UI =====================
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">

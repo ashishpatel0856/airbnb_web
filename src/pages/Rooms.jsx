@@ -66,7 +66,6 @@ export default function Rooms() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const payload = {
       type: form.type,
       basePrice: Number(form.basePrice),
@@ -91,6 +90,7 @@ export default function Rooms() {
       alert("Operation failed");
     }
   };
+
 
   const handleEdit = (room) => {
     setEditingRoom(room);
@@ -190,7 +190,7 @@ export default function Rooms() {
         </div>
       )}
 
-      {/* FORM DRAWER */}
+     
       <AnimatePresence>
         {openForm && (
           <motion.div

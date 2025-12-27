@@ -15,7 +15,7 @@ export default function App() {
     <Routes>
       {/* PUBLIC ROUTES */}
       <Route path="/" element={<Home />} />
-      <Route path="/search" element={<Search />} /> {/* ✅ ADD THIS */}
+      <Route path="/search" element={<Search />} /> 
       <Route path="/hotels/:hotelId" element={<HotelDetails />} />
 
       <Route path="/login" element={<Login />} />

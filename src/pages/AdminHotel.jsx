@@ -4,7 +4,6 @@ import axiosConfig from "../api/axiosConfig";
 import { Edit, Trash2, CheckCircle, Loader2 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-
 const EMPTY_FORM = {
   name: "",
   city: "",
@@ -28,7 +27,6 @@ export default function AdminHotel() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  
   if (!userRole?.includes("HOTEL_MANAGER")) {
     return (
       <div className="min-h-screen flex items-center justify-center text-gray-600">
@@ -36,7 +34,6 @@ export default function AdminHotel() {
       </div>
     );
   }
-
 
   const fetchHotels = async () => {
     setLoading(true);
@@ -55,10 +52,9 @@ export default function AdminHotel() {
     fetchHotels();
   }, []);
 
-
-
   const handleChange = (e) => {
     const { name, value } = e.target;
+
     if (name in formData.contactInfo) {
       setFormData((prev) => ({
         ...prev,
@@ -67,7 +63,6 @@ export default function AdminHotel() {
       return;
     }
 
-    
     if (name === "amenities" || name === "photos") {
       setFormData((prev) => ({
         ...prev,
@@ -82,29 +77,32 @@ export default function AdminHotel() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
 
     try {
       if (editHotel) {
-        await axiosConfig.put(`/admin/hotels/${editHotel.id}`, formData);
+        // PUT request with full formData including photos array
+        const res = await axiosConfig.put(`/admin/hotels/${editHotel.id}`, formData);
+        const updatedHotel = res.data?.data;
+        // Update the specific hotel in state
+        setHotels((prev) =>
+          prev.map((h) => (h.id === updatedHotel.id ? updatedHotel : h))
+        );
       } else {
-        await axiosConfig.post("/admin/hotels/create", formData);
+        const res = await axiosConfig.post("/admin/hotels/create", formData);
+        setHotels((prev) => [...prev, res.data?.data]);
       }
-
       setFormData(EMPTY_FORM);
       setEditHotel(null);
-      fetchHotels();
     } catch (err) {
+      console.error(err);
       alert("Operation failed");
     } finally {
       setSubmitting(false);
     }
   };
-
 
   const handleEdit = (hotel) => {
     setEditHotel(hotel);
@@ -129,7 +127,7 @@ export default function AdminHotel() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-10 space-y-10">
-
+      {/* Create/Edit Form */}
       <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow p-6">
         <h2 className="text-xl font-bold mb-4">
           {editHotel ? "Edit Hotel" : "Create Hotel"}
@@ -184,6 +182,7 @@ export default function AdminHotel() {
         </form>
       </div>
 
+      {/* Hotels List */}
       {loading ? (
         <div className="text-center text-gray-500">Loading hotels...</div>
       ) : hotels.length === 0 ? (
@@ -192,14 +191,10 @@ export default function AdminHotel() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {hotels.map((hotel) => (
             <div key={hotel.id} className="bg-white rounded-xl shadow overflow-hidden">
+              {/* Hotel Images */}
               <div className="h-40 bg-gray-200 grid grid-cols-3 gap-1">
-                {(hotel.photos?.slice(0, 3) || []).map((p, i) => (
-                  <img
-                    key={i}
-                    src={p}
-                    alt="hotel"
-                    className="object-cover w-full h-full"
-                  />
+                {(hotel.photos || []).slice(0, 3).map((p, i) => (
+                  <img key={i} src={p} alt="hotel" className="object-cover w-full h-full" />
                 ))}
               </div>
 
@@ -222,12 +217,9 @@ export default function AdminHotel() {
                   />
                 </div>
 
-                {/*  ROOM MANAGEMENT ENTRY */}
                 {hotel.active && (
                   <button
-                    onClick={() =>
-                      navigate(`/admin/hotels/${hotel.id}/rooms`)
-                    }
+                    onClick={() => navigate(`/admin/hotels/${hotel.id}/rooms`)}
                     className="w-full mt-3 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg"
                   >
                     Manage Rooms
@@ -241,7 +233,6 @@ export default function AdminHotel() {
     </div>
   );
 }
-
 
 const ActionBtn = ({ icon, onClick, danger, active }) => (
   <button
