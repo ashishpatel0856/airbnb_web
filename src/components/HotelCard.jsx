@@ -1,49 +1,37 @@
 import React from "react";
 import Button from "./Button";
+import ImageSlider from "./ImageSlider";
 
 export default function HotelCard({ hotel }) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-4">
-      {/* Hotel Images Carousel */}
-      <div className="flex overflow-x-auto gap-2 snap-x scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 mb-4">
-        {(hotel.photos?.length ? hotel.photos : ["https://placehold.co/600x400"]).map(
-          (img, i) => (
-            <img
-              key={i}
-              src={img}
-              alt={hotel.name}
-              className="h-56 w-[300px] sm:w-[350px] md:w-[400px] object-cover rounded-xl flex-shrink-0 snap-start"
-            />
-          )
-        )}
+    <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-4 space-y-4">
+
+      {/* Hotel Image Slider */}
+      <div className="w-full h-56 sm:h-64 md:h-72 lg:h-80 rounded-xl overflow-hidden">
+        <ImageSlider
+          images={hotel.photos?.length ? hotel.photos : ["https://placehold.co/600x400"]}
+          className="w-full h-full rounded-xl"
+        />
       </div>
 
-      {/* Hotel Name & City */}
+      {/* Hotel Info */}
       <h2 className="text-2xl font-bold">{hotel.name}</h2>
       <p className="text-gray-500">{hotel.city}</p>
-
-      {/* Hotel Amenities */}
-      <p className="text-gray-600 text-sm mt-1">{hotel.amenities?.join(", ")}</p>
+      <p className="text-gray-600 text-sm">{hotel.amenities?.join(", ")}</p>
 
       {/* Rooms Horizontal Scroll */}
-      <div className="mt-4 flex gap-4 overflow-x-auto snap-x scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 py-2">
+      <div className="flex gap-4 overflow-x-auto py-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         {hotel.rooms?.map((room) => (
           <div
             key={room.id}
-            className="flex-shrink-0 w-72 sm:w-80 md:w-96 bg-gray-50 rounded-xl p-3 snap-start"
+            className="flex-shrink-0 w-64 sm:w-72 md:w-80 lg:w-96 bg-gray-50 rounded-xl p-3"
           >
-            {/* Room Images Carousel */}
-            <div className="flex overflow-x-auto gap-2 snap-x mb-2">
-              {(room.photos?.length ? room.photos : ["https://placehold.co/600x400"]).map(
-                (img, i) => (
-                  <img
-                    key={i}
-                    src={img}
-                    alt={room.type}
-                    className="h-40 w-60 sm:w-64 md:w-72 object-cover rounded-lg flex-shrink-0 snap-start"
-                  />
-                )
-              )}
+            {/* Room Image Slider */}
+            <div className="w-full h-40 sm:h-44 md:h-48 lg:h-52 rounded-lg overflow-hidden">
+              <ImageSlider
+                images={room.photos?.length ? room.photos : ["https://placehold.co/600x400"]}
+                className="w-full h-full rounded-lg"
+              />
             </div>
 
             {/* Room Details */}
