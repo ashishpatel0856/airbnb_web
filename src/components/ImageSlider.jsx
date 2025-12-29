@@ -9,7 +9,6 @@ export default function ImageSlider({ images = [], onImageClick, className = "" 
   const next = () => setCurrent((c) => (c === images.length - 1 ? 0 : c + 1));
   const prev = () => setCurrent((c) => (c === 0 ? images.length - 1 : c - 1));
 
-  // Touch events
   const onTouchStart = (e) => {
     startX.current = e.touches[0].clientX;
     isDragging.current = false;
@@ -23,7 +22,6 @@ export default function ImageSlider({ images = [], onImageClick, className = "" 
     if (Math.abs(diff) > 50) diff > 0 ? next() : prev();
   };
 
-  // Mouse events
   const onMouseDown = (e) => {
     startX.current = e.clientX;
     isDragging.current = false;
@@ -43,7 +41,7 @@ export default function ImageSlider({ images = [], onImageClick, className = "" 
 
   return (
     <div className={`relative w-full h-full overflow-hidden ${className}`}>
-      {/* Image */}
+ 
       <img
         src={images[current]}
         alt={`slide-${current}`}
@@ -63,13 +61,13 @@ export default function ImageSlider({ images = [], onImageClick, className = "" 
         <>
           <button
             onClick={(e) => { e.stopPropagation(); prev(); }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full text-white"
+            className="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 p-0.5 rounded-full text-white"
           >
             <ChevronLeft size={20} />
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); next(); }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 p-2 rounded-full text-white"
+            className="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-30 p-0.5 rounded-full text-white"
           >
             <ChevronRight size={20} />
           </button>

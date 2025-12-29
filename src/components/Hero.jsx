@@ -100,12 +100,11 @@ export default function Hero() {
             </div>
           </div>
 
-          <Button
-            onClick={handleSearch}
-            className="bg-[#FF385C] text-white"
-          >
-            Search
+        <div className="mt-auto">
+          <Button onClick={handleSearch} className="w-full py-3 bg-[#FF385C] hover:bg-[#e0314f] text-white rounded-2xl text-sm font-medium">
+            search now
           </Button>
+          </div>
         </motion.div>
       </div>
     </section>

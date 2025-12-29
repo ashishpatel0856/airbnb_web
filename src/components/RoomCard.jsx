@@ -1,7 +1,7 @@
 import React from "react";
 import { IndianRupee, BedDouble } from "lucide-react";
 import Button from "./Button";
-import ImageSlider from "./ImageSlider"; // reusable component
+import ImageSlider from "./ImageSlider"; 
 
 export default function RoomCard({ room, onClick }) {
   return (
@@ -11,7 +11,7 @@ export default function RoomCard({ room, onClick }) {
       <div className="w-full h-44 sm:h-52 md:h-56 select-none">
         <ImageSlider
           images={room.photos?.length ? room.photos : ["https://placehold.co/600x400"]}
-          onImageClick={onClick ? () => onClick(room) : undefined} // click action
+          onImageClick={onClick ? () => onClick(room) : undefined} 
         />
       </div>
 

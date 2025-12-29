@@ -1,6 +1,7 @@
 import React from "react";
 import Button from "./Button";
 import ImageSlider from "./ImageSlider";
+import { IndianRupee } from "lucide-react";
 
 export default function HotelCard({ hotel }) {
   return (
@@ -41,9 +42,16 @@ export default function HotelCard({ hotel }) {
                 Capacity: {room.capacity} | Available: {room.availableRooms}
               </p>
               <p className="text-gray-600 text-sm">{room.amenities?.join(", ")}</p>
-              <p className="text-green-600 font-bold text-lg mt-1">
-                ₹{room.price}/night
-              </p>
+              
+
+
+               
+            <div className="flex items-center gap-1 text-green-600 font-bold mt-2">
+              <IndianRupee size={16} />
+              <span>{room.price}/night</span>
+            </div>
+
+            
 
               <Button className="mt-2 w-full bg-[#FF385C] hover:bg-[#e0314f] text-white rounded-xl py-2 text-sm font-medium">
                 Book Now

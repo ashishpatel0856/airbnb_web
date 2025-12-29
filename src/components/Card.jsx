@@ -1,7 +1,7 @@
 import { MapPin } from "lucide-react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import ImageSlider from "./ImageSlider"; // Tumhara reusable slider
+import ImageSlider from "./ImageSlider";
 
 export default function Card({ hotel }) {
   const navigate = useNavigate();
@@ -12,16 +12,14 @@ export default function Card({ hotel }) {
 
   return (
     <div className="bg-white rounded-xl shadow hover:shadow-lg transition overflow-hidden flex flex-col">
-      {/* IMAGE SLIDER */}
       <div className="w-full h-44 sm:h-52 md:h-56 rounded-xl overflow-hidden">
         <ImageSlider
           images={hotel.photos?.length ? hotel.photos : ["https://placehold.co/600x400"]}
-          onClick={handleClick} // Only navigate on actual click
+          onClick={handleClick} 
           className="w-full h-full rounded-xl"
         />
       </div>
 
-      {/* CONTENT → Only this navigates on click */}
       <div
         onClick={handleClick}
         className="p-4 flex flex-col gap-2 flex-1 cursor-pointer"
