@@ -1,25 +1,31 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { API_ENDPOINTS } from "../constants/apiEndpoints";
 import api from "../api/axiosConfig";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode"; // fixed import
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("token") || null);
-  const [userRole, setUserRole] = useState(null); // user role
+  const [userRole, setUserRole] = useState(""); // user role
+  const [userName, setUserName] = useState(""); // add username
   const [loading, setLoading] = useState(false);
 
-  // Decode role from token if token exists
+  // Decode token on page load or token change
   useEffect(() => {
     if (token) {
       try {
         const decoded = jwtDecode(token);
-        setUserRole(decoded.roles || []); // roles from backend JWT
+        setUserRole(decoded.roles || []);
+        setUserName(decoded.name || ""); // set name from JWT
       } catch (err) {
         console.error("Invalid token", err);
-        setUserRole(null);
+        setUserRole("");
+        setUserName("");
       }
+    } else {
+      setUserRole("");
+      setUserName("");
     }
   }, [token]);
 
@@ -27,13 +33,13 @@ export const AuthProvider = ({ children }) => {
   const signup = async ({ name, email, password, gender, dateOfBirth, roles }) => {
     setLoading(true);
     try {
-      const res = await api.post(API_ENDPOINTS.REGISTER, {
+      await api.post(API_ENDPOINTS.REGISTER, {
         name,
         email,
         password,
         gender,
         dateOfBirth,
-        roles: roles || [], // send roles if provided
+        roles: roles || [],
       });
       return { ok: true };
     } catch (err) {
@@ -45,26 +51,25 @@ export const AuthProvider = ({ children }) => {
 
   // Login
   const login = async ({ email, password }) => {
-      console.log("LOGIN HIT", email, password);
-
+    setLoading(true);
     try {
       const res = await api.post(API_ENDPOINTS.LOGIN, { email, password });
-          console.log("LOGIN RESPONSE", res.data); 
-
       const jwt = res.data?.accessToken || res.data?.data?.accessToken;
-
       if (!jwt) return { ok: false, error: { message: "Token missing" } };
 
       localStorage.setItem("token", jwt);
       setToken(jwt);
 
-      // Decode JWT to get roles
+      // Decode JWT to get roles and username
       const decoded = jwtDecode(jwt);
       setUserRole(decoded.roles || []);
+      setUserName(decoded.name || ""); // set name from JWT
 
       return { ok: true };
     } catch (err) {
       return { ok: false, error: err.response?.data || { message: "Login failed" } };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,11 +77,12 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem("token");
     setToken(null);
-    setUserRole(null);
+    setUserRole("");
+    setUserName(""); // clear username on logout
   };
 
   return (
-    <AuthContext.Provider value={{ token, userRole, signup, login, logout, loading }}>
+    <AuthContext.Provider value={{ token, userRole, userName, signup, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,16 +5,9 @@ import { useAuth } from "../context/AuthContext";
 export default function ProtectedRoute({ children, allowedRoles = [] }) {
   const { token, userRole } = useAuth();
 
-  // not logged in
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!token) return <Navigate to="/login" replace />;
 
-  // role check
-  if (
-    allowedRoles.length > 0 &&
-    !allowedRoles.some((role) => userRole?.includes(role))
-  ) {
+  if (allowedRoles.length > 0 && !allowedRoles.some((r) => userRole.includes(r))) {
     return <Navigate to="/" replace />;
   }
 
