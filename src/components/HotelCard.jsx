@@ -2,8 +2,10 @@ import React from "react";
 import Button from "./Button";
 import ImageSlider from "./ImageSlider";
 import { IndianRupee } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function HotelCard({ hotel }) {
+  const navigate = useNavigate();
   return (
     <div className="bg-white rounded-2xl shadow-lg overflow-hidden p-4 space-y-4">
 
@@ -52,10 +54,12 @@ export default function HotelCard({ hotel }) {
             </div>
 
             
-
-              <Button className="mt-2 w-full bg-[#FF385C] hover:bg-[#e0314f] text-white rounded-xl py-2 text-sm font-medium">
-                Book Now
-              </Button>
+             <Button
+              onClick={() => navigate(`/hotels/${hotel.id}`)}
+              className="mt-2 w-full bg-[#FF385C] text-white rounded-xl py-2"
+            >
+              Book Now
+            </Button>
             </div>
           </div>
         ))}

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import api from '../api/axiosConfig';
-import Skeleton from "../components/Skeleton"; // Make sure you imported Skeleton
+import api from "../api/axiosConfig";
+import ImageSlider from "../components/ImageSlider";
+import Skeleton from "../components/Skeleton";
 
 const STATUS_STYLES = {
   CONFIRMED: "bg-green-100 text-green-700",
   CANCELLED: "bg-red-100 text-red-700",
   RESERVED: "bg-yellow-100 text-yellow-700",
-  GUESTS_ADDED: "bg-blue-100 text-blue-700",
 };
 
 const BookingPage = () => {
@@ -17,10 +17,9 @@ const BookingPage = () => {
     setLoading(true);
     try {
       const res = await api.get("/users/myBookings");
-       setBookings(res.data.data || []);
-
+      setBookings(res.data.data || []);
     } catch (err) {
-      console.error("Failed to fetch bookings", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -30,53 +29,45 @@ const BookingPage = () => {
     fetchBookings();
   }, []);
 
-  const handleCancel = async (bookingId) => {
-    if (!window.confirm("Are you sure you want to cancel this booking?")) return;
-    setLoading(true);
+  const handlePayment = async (id) => {
     try {
-      await api.post(`/bookings/${bookingId}/cancel`);
-      fetchBookings(); // refresh bookings
-    } catch (err) {
-      console.error(err);
-      alert("Failed to cancel booking");
-    } finally {
-      setLoading(false);
+      const res = await api.post(`/bookings/${id}/payments`);
+      window.location.href = res.data.sessionUrl;
+    } catch {
+      alert("Payment failed");
     }
   };
 
-  const handlePayment = async (bookingId) => {
-    setLoading(true);
+  const handleCancel = async (id) => {
+    if (!window.confirm("Cancel booking?")) return;
     try {
-      const res = await api.post(`/bookings/${bookingId}/payments`);
-      window.location.href = res.data.sessionUrl; // redirect to Stripe
-    } catch (err) {
-      console.error(err);
-      alert("Payment failed");
-    } finally {
-      setLoading(false);
+      await api.post(`/bookings/${id}/cancel`);
+      fetchBookings();
+    } catch {
+      alert("Cancel failed");
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">My Bookings</h1>
 
+      {/* Loading */}
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="border rounded-2xl p-5 space-y-4">
-              <Skeleton className="h-5 w-1/2 rounded" />
-              <Skeleton className="h-4 w-3/4 rounded" />
-              <Skeleton className="h-4 w-2/3 rounded" />
-              <Skeleton className="h-4 w-1/3 rounded" />
+            <div key={i} className="border rounded-2xl p-4 space-y-3">
+              <Skeleton className="h-40 w-full rounded-xl" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
             </div>
           ))}
         </div>
       )}
 
       {!loading && bookings.length === 0 && (
-        <p className="text-gray-500 text-center mt-20">
-          No bookings found.
+        <p className="text-center text-gray-500 mt-20">
+          No bookings found
         </p>
       )}
 
@@ -85,62 +76,86 @@ const BookingPage = () => {
           {bookings.map((b) => (
             <div
               key={b.id}
-              className="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition"
+              className="bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden"
             >
-              <div className="flex justify-between items-center mb-3">
-                <h2 className="font-semibold text-lg">Booking #{b.id}</h2>
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium ${
-                    STATUS_STYLES[b.bookingStatus]
-                  }`}
-                >
-                  {b.bookingStatus}
-                </span>
+              {/* IMAGE */}
+              <div className="h-48 w-full">
+                {b.hotelPhotos?.length ? (
+                  <ImageSlider images={b.hotelPhotos} />
+                ) : (
+                  <div className="h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                    No Image
+                  </div>
+                )}
               </div>
 
-              <div className="text-sm text-gray-600 space-y-1">
-                <p>
-                  <span className="font-medium">Check-in:</span> {b.checkInDate}
-                </p>
-                <p>
-                  <span className="font-medium">Check-out:</span> {b.checkOutDate}
-                </p>
-                <p>
-                  <span className="font-medium">Rooms:</span> {b.roomsCount}
-                </p>
-                <p>
-                  <span className="font-medium">Amount:</span> ₹{b.amount}
-                </p>
-              </div>
-
-              {b.guests?.length > 0 && (
-                <div className="mt-4">
-                  <p className="text-sm font-medium text-gray-800 mb-1">Guests</p>
-                  <ul className="list-disc list-inside text-sm text-gray-600">
-                    {b.guests.map((g, i) => (
-                      <li key={i}>{g.name}</li>
-                    ))}
-                  </ul>
+              {/* CONTENT */}
+              <div className="p-4 space-y-3">
+                <div className="flex justify-between items-center">
+                  <h2 className="font-semibold text-lg truncate">
+                    {b.hotelName || "Hotel"}
+                  </h2>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${STATUS_STYLES[b.bookingStatus]}`}
+                  >
+                    {b.bookingStatus}
+                  </span>
                 </div>
-              )}
 
-              <div className="mt-4 flex space-x-2">
-                {b.bookingStatus === "RESERVED" && (
-                  <button
-                    onClick={() => handlePayment(b.id)}
-                    className="flex-1 px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                  >
-                    Pay Now
-                  </button>
-                )}
-                {b.bookingStatus !== "CANCELLED" && (
-                  <button
-                    onClick={() => handleCancel(b.id)}
-                    className="flex-1 px-3 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                  >
-                    Cancel
-                  </button>
-                )}
+                <p className="text-sm text-gray-500">
+                  Room: <span className="font-medium">{b.roomType}</span>
+                </p>
+
+                <div className="text-sm text-gray-600">
+                  <p>Check-in: {b.checkInDate}</p>
+                  <p>Check-out: {b.checkOutDate}</p>
+                  <p>Rooms: {b.roomsCount}</p>
+                  <p className="font-semibold text-black">
+                    ₹{b.amount}
+                  </p>
+                </div>
+
+                {/* AMENITIES */}
+                {/* {b.roomAmenities?.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {b.roomAmenities.map((a, i) => (
+                      <span
+                        key={i}
+                        className="text-xs bg-gray-100 px-2 py-1 rounded-full"
+                      >
+                        {a}
+                      </span>
+                    ))}
+                  </div>
+                )} */}
+
+                     {b.roomAmenities?.length > 0 && (
+                      <p className="text-gray-600 text-sm sm:text-base">
+                        <span className="font-medium">Amenities:</span>{" "}
+                        {b.roomAmenities.join(", ")}
+                      </p>
+                    )}
+
+
+                {/* ACTIONS */}
+                <div className="flex gap-2 pt-3">
+                  {b.bookingStatus === "RESERVED" && (
+                    <button
+                      onClick={() => handlePayment(b.id)}
+                      className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                    >
+                      Pay Now
+                    </button>
+                  )}
+                  {b.bookingStatus !== "CANCELLED" && (
+                    <button
+                      onClick={() => handleCancel(b.id)}
+                      className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700"
+                    >
+                      Cancel
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           ))}

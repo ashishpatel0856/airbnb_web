@@ -31,29 +31,24 @@ export default function HotelDetails() {
   }, [hotelId]);
 
   // Handle room booking
-  const handleBookNow = async (room) => {
-    const checkIn = "2026-01-10";   // TODO: Replace with date picker
-    const checkOut = "2026-01-12";
+const handleBookNow = async (room) => {
+  const checkIn = "2026-01-10";
+  const checkOut = "2026-01-12";
 
-    const payload = {
+  try {
+    const booking = await createBooking({
       hotelId,
       roomId: room.id,
       checkInDate: checkIn,
       checkOutDate: checkOut,
-      roomsCount: 1
-    };
-
-    console.log("POST URL:", api.defaults.baseURL + "/bookings/init");
-    console.log("Booking payload:", payload);
-
-    try {
-      await createBooking(payload);
-      navigate("/my-bookings");
-    } catch (err) {
-      console.error("Failed to create booking:", err);
-      alert("Booking failed. Please try again.");
-    }
-  };
+      roomsCount: 1,
+    });
+    console.log("Booking successful:", booking);
+    navigate("/my-bookings");
+  } catch (err) {
+    alert("Failed to book room. Please try again.");
+  }
+};
 
   if (loading)
     return <p className="text-center mt-20 text-gray-600">Loading hotel...</p>;
