@@ -1,53 +1,92 @@
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
-import api from '../api/axiosConfig';
-import Navbar from '../components/Navbar';
-import RoomCard from '../components/RoomCard';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../api/axiosConfig";
+import Navbar from "../components/Navbar";
+import RoomCard from "../components/RoomCard";
+import { useBooking } from "../context/BookingContext";
 
-const HotelDetails = () => {
+export default function HotelDetails() {
+  const { hotelId } = useParams();
+  const navigate = useNavigate();
+  const { createBooking } = useBooking();
 
-    const {hotelId} = useParams();
-    const [hotel,setHotel] = useState(null);
-    const [rooms,setRooms] = useState([]);
-    const [loading,setLoading] = useState(false);
+  const [hotel, setHotel] = useState(null);
+  const [rooms, setRooms] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    const fetchHotelDetails = async () => {
-        setLoading(true);
-        try {
-           const res = await api.get(`/public/hotels/${hotelId}`);
-           console.log("Hotel details",res.data)
-           setHotel(res.data?.data.hotel); 
-           setRooms(res.data?.data?.rooms || []);
-           console.log("Hotel:", res.data.data.hotel);
-           console.log("Rooms:", res.data.data.rooms);
-
-        } catch(err){
-             console.error("Error fetching hotel details" , err);
-        } finally {
-            setLoading(false);
-        }
+  // Fetch hotel and rooms
+  useEffect(() => {
+    const fetchHotel = async () => {
+      try {
+        const res = await api.get(`/public/hotels/${hotelId}`);
+        setHotel(res.data.data.hotel);
+        setRooms(res.data.data.rooms || []);
+      } catch (err) {
+        console.error("Failed to fetch hotel", err);
+      } finally {
+        setLoading(false);
+      }
     };
-    useEffect(() => {
-        fetchHotelDetails();
-    },[hotelId]);
+    fetchHotel();
+  }, [hotelId]);
 
-    if (loading) return <p className='text-center mt-20'>Loading hotel...</p>;
-    if (!hotel) return <p className='text-center mt-20'>Hotel not found</p>;
+  // Handle room booking
+  const handleBookNow = async (room) => {
+    const checkIn = "2026-01-10";   // TODO: Replace with date picker
+    const checkOut = "2026-01-12";
+
+    const payload = {
+      hotelId,
+      roomId: room.id,
+      checkInDate: checkIn,
+      checkOutDate: checkOut,
+      roomsCount: 1
+    };
+
+    console.log("POST URL:", api.defaults.baseURL + "/bookings/init");
+    console.log("Booking payload:", payload);
+
+    try {
+      await createBooking(payload);
+      navigate("/my-bookings");
+    } catch (err) {
+      console.error("Failed to create booking:", err);
+      alert("Booking failed. Please try again.");
+    }
+  };
+
+  if (loading)
+    return <p className="text-center mt-20 text-gray-600">Loading hotel...</p>;
+  if (!hotel)
+    return <p className="text-center mt-20 text-gray-600">Hotel not found</p>;
+
   return (
     <>
-    <Navbar/>
-    <section className='max-w-7xl mx-auto px-6 py-16'>
-        <h1 className='text-3xl font-bold mt-4'>{hotel.name}</h1>
-        <p className='text-gray-600 mb-6'>{hotel.city}</p>
+      <Navbar />
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
-            {rooms.map((room) => (
-                <RoomCard key={room.id} room={room}/>
-            ))}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Hotel Info */}
+        <div className="mb-8 text-center sm:text-left">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-2">{hotel.name}</h1>
+          <p className="text-gray-700 mb-2">{hotel.city}</p>
+          {hotel.amenities?.length > 0 && (
+            <p className="text-gray-600 text-sm sm:text-base">
+              Amenities: {hotel.amenities.join(", ")}
+            </p>
+          )}
         </div>
-    </section>
-    </>
-  )
-}
 
-export default HotelDetails 
+        {/* Rooms Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {rooms.map((room) => (
+            <RoomCard
+              key={room.id}
+              room={room}
+              onBook={handleBookNow}
+            />
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
