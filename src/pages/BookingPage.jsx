@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import api from "../api/axiosConfig";
 import ImageSlider from "../components/ImageSlider";
 import Skeleton from "../components/Skeleton";
+import Input from "../components/Input";
 
 const STATUS_STYLES = {
   CONFIRMED: "bg-green-100 text-green-700",
@@ -12,6 +13,24 @@ const STATUS_STYLES = {
 const BookingPage = () => {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [showGuestModal, setShowGuestModal] = useState(false);
+  const [activeBookingId, setActiveBookingId] = useState(null);
+  const [guests, setGuests] = useState([{ name: "", gender: "MALE", age: "" }]);
+
+  const openGuestModal = (bookingId) => {
+    setActiveBookingId(bookingId);
+    setShowGuestModal(true);
+  };
+
+  const handleGuestChange = (index, field, value) => {
+    const updated = [...guests];
+    updated[index][field] = value;
+    setGuests(updated);
+  };
+
+  const addMoreGuest = () => {
+    setGuests([...guests, { name: "", gender: "MALE", age: "" }]);
+  };
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -48,11 +67,21 @@ const BookingPage = () => {
     }
   };
 
+  const submitGuests = async () => {
+    try {
+      await api.post(`/bookings/${activeBookingId}/addGuests`, guests);
+      setShowGuestModal(false);
+      setGuests([{ name: "", gender: "MALE", age: "" }]);
+      fetchBookings();
+    } catch (err) {
+      alert("Failed to add guests");
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">My Bookings</h1>
 
-      {/* Loading */}
       {loading && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
@@ -66,9 +95,7 @@ const BookingPage = () => {
       )}
 
       {!loading && bookings.length === 0 && (
-        <p className="text-center text-gray-500 mt-20">
-          No bookings found
-        </p>
+        <p className="text-center text-gray-500 mt-20">No bookings found</p>
       )}
 
       {!loading && bookings.length > 0 && (
@@ -110,43 +137,41 @@ const BookingPage = () => {
                   <p>Check-in: {b.checkInDate}</p>
                   <p>Check-out: {b.checkOutDate}</p>
                   <p>Rooms: {b.roomsCount}</p>
-                  <p className="font-semibold text-black">
-                    ₹{b.amount}
-                  </p>
+                  <p className="font-semibold text-black">₹{b.amount}</p>
                 </div>
 
                 {/* AMENITIES */}
-                {/* {b.roomAmenities?.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {b.roomAmenities.map((a, i) => (
-                      <span
-                        key={i}
-                        className="text-xs bg-gray-100 px-2 py-1 rounded-full"
-                      >
-                        {a}
-                      </span>
-                    ))}
-                  </div>
-                )} */}
+                {b.roomAmenities?.length > 0 && (
+                  <p className="text-gray-600 text-sm sm:text-base">
+                    <span className="font-medium">Amenities:</span>{" "}
+                    {b.roomAmenities.join(", ")}
+                  </p>
+                )}
 
-                     {b.roomAmenities?.length > 0 && (
-                      <p className="text-gray-600 text-sm sm:text-base">
-                        <span className="font-medium">Amenities:</span>{" "}
-                        {b.roomAmenities.join(", ")}
-                      </p>
-                    )}
+                {/* GUESTS */}
+               {b.guests?.length > 0 && (
+  <div className="mt-2">
+    <p className="text-sm font-medium text-gray-700">
+      Guests:
+    </p>
+    <p className="text-sm text-gray-600">
+      {b.guests.map(g => g.name).join(", ")}
+    </p>
+  </div>
+)}
 
 
                 {/* ACTIONS */}
                 <div className="flex gap-2 pt-3">
                   {b.bookingStatus === "RESERVED" && (
                     <button
-                      onClick={() => handlePayment(b.id)}
-                      className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                      onClick={() => openGuestModal(b.id)}
+                      className="flex-1 px-3 py-2 bg-gray-800 text-white rounded hover:bg-black"
                     >
-                      Pay Now
+                      Add Guests
                     </button>
                   )}
+
                   {b.bookingStatus !== "CANCELLED" && (
                     <button
                       onClick={() => handleCancel(b.id)}
@@ -159,6 +184,81 @@ const BookingPage = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* GUEST MODAL */}
+      {showGuestModal && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-3">
+          <div className="bg-white rounded-2xl p-5 w-full max-w-lg">
+            <h2 className="text-lg font-bold mb-4">Add Guests</h2>
+
+            <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+              {guests.map((g, i) => (
+                <div key={i} className="border rounded-xl p-4 space-y-3">
+                  <Input
+                    label="Guest Name"
+                    placeholder="Enter name"
+                    value={g.name}
+                    onChange={(e) =>
+                      handleGuestChange(i, "name", e.target.value)
+                    }
+                  />
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-sm font-medium text-gray-700">
+                        Gender
+                      </label>
+                      <select
+                        className="w-full border rounded-lg px-3 py-2 text-sm"
+                        value={g.gender}
+                        onChange={(e) =>
+                          handleGuestChange(i, "gender", e.target.value)
+                        }
+                      >
+                        <option value="MALE">Male</option>
+                        <option value="FEMALE">Female</option>
+                      </select>
+                    </div>
+
+                    <Input
+                      label="Age"
+                      type="number"
+                      placeholder="Age"
+                      value={g.age}
+                      onChange={(e) =>
+                        handleGuestChange(i, "age", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={addMoreGuest}
+              className="w-full mt-4 bg-gray-100 py-2 rounded-lg text-sm"
+            >
+              + Add another guest
+            </button>
+
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => setShowGuestModal(false)}
+                className="flex-1 border py-2 rounded-lg"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={submitGuests}
+                className="flex-1 bg-[#FF385C] text-white py-2 rounded-lg"
+              >
+                Save Guests
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

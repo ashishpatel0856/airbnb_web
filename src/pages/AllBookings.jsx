@@ -79,7 +79,14 @@ export default function AllBookings({ hotelId }) {
                 <p>
                   <span className="font-medium">Amount:</span> ₹{b.amount}
                 </p>
+                 {b.guests?.length > 0 && (
+    <p className="text-sm text-gray-600 mt-2">
+      Guests: {b.guests.map(g => g.name).join(", ")}
+    </p>
+  )}
               </div>
+
+              
 
               {b.guests?.length > 0 && (
                 <div className="mt-4">

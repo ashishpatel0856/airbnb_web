@@ -7,10 +7,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Search from "./pages/Search";
 import HotelDetails from "./pages/HotelDetails";
-
 import AdminHotel from "./pages/AdminHotel";
 import Rooms from "./pages/Rooms";
-
 import ProtectedRoute from "./components/ProtectedRoute";
 import BookingPage from "./pages/BookingPage";
 import AllBookings from "./pages/AllBookings";

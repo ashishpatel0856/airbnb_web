@@ -28,7 +28,6 @@ export const BookingProvider = ({ children }) => {
     setError(null);
 
     try {
-      // Debug: log the payload
       console.log("Booking payload:", { hotelId, roomId, checkInDate, checkOutDate, roomsCount });
       console.log("POST URL:", api.defaults.baseURL + "/bookings/init");
       const res = await api.post("/bookings/init", {
@@ -52,6 +51,7 @@ export const BookingProvider = ({ children }) => {
   };
 
   const clearBooking = () => setCurrentBooking(null);
+
 
   return (
     <BookingContext.Provider
