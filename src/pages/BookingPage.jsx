@@ -32,6 +32,8 @@ const BookingPage = () => {
     setGuests([...guests, { name: "", gender: "MALE", age: "" }]);
   };
 
+
+  // fetching all bookings
   const fetchBookings = async () => {
     setLoading(true);
     try {
@@ -48,6 +50,8 @@ const BookingPage = () => {
     fetchBookings();
   }, []);
 
+
+  // payments
   const handlePayment = async (id) => {
     try {
       const res = await api.post(`/bookings/${id}/payments`);
@@ -57,6 +61,9 @@ const BookingPage = () => {
     }
   };
 
+
+
+  //cancel bookings
   const handleCancel = async (id) => {
     if (!window.confirm("Cancel booking?")) return;
     try {
@@ -67,6 +74,8 @@ const BookingPage = () => {
     }
   };
 
+
+  // adding new guest
   const submitGuests = async () => {
     try {
       await api.post(`/bookings/${activeBookingId}/addGuests`, guests);
@@ -150,37 +159,62 @@ const BookingPage = () => {
 
                 {/* GUESTS */}
                {b.guests?.length > 0 && (
-  <div className="mt-2">
-    <p className="text-sm font-medium text-gray-700">
-      Guests:
-    </p>
-    <p className="text-sm text-gray-600">
-      {b.guests.map(g => g.name).join(", ")}
-    </p>
-  </div>
-)}
+                <div className="mt-2">
+                  <p className="text-sm font-medium text-gray-700">
+                    Guests:
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    {b.guests.map(g => g.name).join(", ")}
+                  </p>
+                </div>
+              )}
 
 
                 {/* ACTIONS */}
-                <div className="flex gap-2 pt-3">
-                  {b.bookingStatus === "RESERVED" && (
-                    <button
-                      onClick={() => openGuestModal(b.id)}
-                      className="flex-1 px-3 py-2 bg-gray-800 text-white rounded hover:bg-black"
-                    >
-                      Add Guests
-                    </button>
-                  )}
+    
+            <div className="flex gap-2 pt-3">
 
-                  {b.bookingStatus !== "CANCELLED" && (
-                    <button
-                      onClick={() => handleCancel(b.id)}
-                      className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                </div>
+            {/* RESERVED → Add Guests */}
+              {b.bookingStatus === "RESERVED" && (
+                <button
+                  onClick={() => openGuestModal(b.id)}
+                  className="flex-1 px-3 py-2 bg-gray-800 text-white rounded-lg hover:bg-black"
+                >
+                  Add Guests
+                </button>
+              )}
+
+              {/* GUESTS_ADDED → Pay + Cancel */}
+              {b.bookingStatus === "GUESTS_ADDED" && (
+                <>
+                  <button
+                    onClick={() => handlePayment(b.id)}
+                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
+                  >
+                    Pay Now
+                  </button>
+
+                  <button
+                    onClick={() => handleCancel(b.id)}
+                    className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700"
+                  >
+                    Cancel
+                  </button>
+                </>
+              )}
+
+              {/* CONFIRMED → Cancel only */}
+              {b.bookingStatus === "CONFIRMED" && (
+                <button
+                  onClick={() => handleCancel(b.id)}
+                  className="flex-1 bg-red-600 text-white py-2 rounded-lg hover:bg-red-700"
+                >
+                  Cancel
+                </button>
+              )}
+
+            </div>
+
               </div>
             </div>
           ))}
@@ -219,6 +253,7 @@ const BookingPage = () => {
                       >
                         <option value="MALE">Male</option>
                         <option value="FEMALE">Female</option>
+                        <option value="Others">Others</option>
                       </select>
                     </div>
 
